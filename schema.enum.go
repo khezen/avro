@@ -2,22 +2,22 @@ package avro
 
 import "encoding/json"
 
-// Fixed -
-type Fixed struct {
+// EnumSchema -
+type EnumSchema struct {
 	Type          Type     `json:"type"`
 	Name          string   `json:"name"`
 	Namespace     string   `json:"namespace,omitempty"`
 	Aliases       []string `json:"aliases,omitempty"`
 	Documentation string   `json:"doc,omitempty"`
-	Size          int      `json:"size"`
+	Symbols       []string `json:"symbols"`
 }
 
 // TypeName -
-func (t *Fixed) TypeName() Type {
-	return TypeFixed
+func (t *EnumSchema) TypeName() Type {
+	return TypeEnum
 }
 
 // MarshalJSON -
-func (t *Fixed) MarshalJSON() ([]byte, error) {
+func (t *EnumSchema) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t)
 }

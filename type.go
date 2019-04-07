@@ -2,24 +2,8 @@ package avro
 
 import "encoding/json"
 
-// Schema -
-type Schema interface {
-	json.Marshaler
-	TypeName() Type
-}
-
 // Type - primitive or derived type name as defined below
 type Type string
-
-// Name -
-func (t *Type) Name() Type {
-	return *t
-}
-
-// MarshalJSON -
-func (t *Type) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t)
-}
 
 const (
 	// Primitve types
@@ -56,3 +40,13 @@ const (
 	// TypeFixed -
 	TypeFixed Type = "fixed"
 )
+
+// Name -
+func (t *Type) Name() Type {
+	return *t
+}
+
+// MarshalJSON -
+func (t *Type) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t)
+}
