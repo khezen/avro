@@ -1,8 +1,6 @@
 package avro
 
 import (
-	"encoding/json"
-
 	"github.com/valyala/fastjson"
 )
 
@@ -10,7 +8,6 @@ var unmarshaller fastjson.Parser
 
 // Schema -
 type Schema interface {
-	json.Marshaler
 	TypeName() Type
 }
 
@@ -34,9 +31,18 @@ func (as *AnySchema) UnmarshalJSON(bytes []byte) error {
 }
 
 func translateValue2AnySchema(value *fastjson.Value) (Schema, error) {
+	union, err := value.Array()
+	isUnion := err == nil
+	if isUnion {
+		return translateValues2UnionSchema(union)
+	}
 	isComplex := value.Exists("type")
 	if isComplex {
-		typeName := Type(value.Get("type").String())
+		stringBytes, err := value.Get("type").StringBytes()
+		if err != nil {
+			return nil, ErrInvalidSchema
+		}
+		typeName := Type(stringBytes)
 		switch typeName {
 		case TypeArray:
 			return translateValue2ArraySchema(value)
@@ -52,15 +58,11 @@ func translateValue2AnySchema(value *fastjson.Value) (Schema, error) {
 			return nil, ErrUnsupportedType
 		}
 	}
-	array, err := value.Array()
+	stringBytes, err := value.StringBytes()
 	if err != nil {
 		return nil, ErrInvalidSchema
 	}
-	isUnion := err == nil
-	if isUnion {
-		return translateValues2UnionSchema(array)
-	}
-	typeName := Type(value.String())
+	typeName := Type(stringBytes)
 	switch typeName {
 	case TypeNull, TypeBoolean, TypeFloat32, TypeFloat64, TypeInt32, TypeInt64, TypeString, TypeBytes:
 		return typeName, nil

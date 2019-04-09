@@ -1,7 +1,5 @@
 package avro
 
-import "encoding/json"
-
 // Type - primitive or derived type name as defined below
 type Type string
 
@@ -44,9 +42,4 @@ const (
 // TypeName -
 func (t Type) TypeName() Type {
 	return t
-}
-
-// MarshalJSON -
-func (t Type) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t)
 }

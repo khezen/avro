@@ -1,8 +1,6 @@
 package avro
 
 import (
-	"encoding/json"
-
 	"github.com/valyala/fastjson"
 )
 
@@ -19,11 +17,6 @@ type FixedSchema struct {
 // TypeName -
 func (t *FixedSchema) TypeName() Type {
 	return TypeFixed
-}
-
-// MarshalJSON -
-func (t *FixedSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t)
 }
 
 func translateValueToFixedSchema(value *fastjson.Value) (Schema, error) {

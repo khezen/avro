@@ -12,7 +12,7 @@ type RecordFieldSchema struct {
 	Aliases       []string        `json:"aliases,omitempty"`
 	Documentation string          `json:"doc,omitempty"`
 	Type          Schema          `json:"type"`
-	Default       json.RawMessage `json:"default,omitmepty"`
+	Default       json.RawMessage `json:"default,omitempty"`
 	Order         Order           `json:"order,omitempty"`
 }
 
@@ -33,7 +33,7 @@ func translateValueToRecordFieldSchema(value *fastjson.Value) (*RecordFieldSchem
 	if !value.Exists("type") {
 		return nil, ErrInvalidSchema
 	}
-	anySchema, err := translateValue2AnySchema(value)
+	anySchema, err := translateValue2AnySchema(value.Get("type"))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func translateValueToRecordFieldSchema(value *fastjson.Value) (*RecordFieldSchem
 		defaultValue []byte
 	)
 	if value.Exists("order") {
-		order = Order(value.Get("order").String())
+		order = Order(value.GetStringBytes("order"))
 	}
 	if value.Exists("default") {
 		defaultValue = value.GetStringBytes("default")

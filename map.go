@@ -1,8 +1,6 @@
 package avro
 
 import (
-	"encoding/json"
-
 	"github.com/valyala/fastjson"
 )
 
@@ -15,11 +13,6 @@ type MapSchema struct {
 // TypeName -
 func (t *MapSchema) TypeName() Type {
 	return TypeMap
-}
-
-// MarshalJSON -
-func (t *MapSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t)
 }
 
 func translateValueToMapSchema(value *fastjson.Value) (Schema, error) {

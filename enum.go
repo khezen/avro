@@ -1,8 +1,6 @@
 package avro
 
 import (
-	"encoding/json"
-
 	"github.com/valyala/fastjson"
 )
 
@@ -19,11 +17,6 @@ type EnumSchema struct {
 // TypeName -
 func (t *EnumSchema) TypeName() Type {
 	return TypeEnum
-}
-
-// MarshalJSON -
-func (t *EnumSchema) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t)
 }
 
 func translateValueToEnumSchema(value *fastjson.Value) (Schema, error) {
