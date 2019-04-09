@@ -15,12 +15,12 @@ func (t *ArraySchema) TypeName() Type {
 	return TypeArray
 }
 
-func translateValue2ArraySchema(value *fastjson.Value) (Schema, error) {
+func translateValue2ArraySchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
 	if !value.Exists("items") {
 		return nil, ErrInvalidSchema
 	}
 	itemsVal := value.Get("items")
-	itemSchema, err := translateValue2AnySchema(itemsVal)
+	itemSchema, err := translateValue2AnySchema(itemsVal, additionalTypes...)
 	if err != nil {
 		return nil, err
 	}

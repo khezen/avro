@@ -12,10 +12,10 @@ func (t UnionSchema) TypeName() Type {
 	return TypeUnion
 }
 
-func translateValues2UnionSchema(values []*fastjson.Value) (Schema, error) {
+func translateValues2UnionSchema(values []*fastjson.Value, additionalTypes ...Type) (Schema, error) {
 	union := UnionSchema(make([]Schema, 0, len(values)))
 	for _, value := range values {
-		schema, err := translateValue2AnySchema(value)
+		schema, err := translateValue2AnySchema(value, additionalTypes...)
 		if err != nil {
 			return nil, err
 		}

@@ -19,7 +19,7 @@ func (t *RecordSchema) TypeName() Type {
 	return TypeRecord
 }
 
-func translateValueToRecordSchema(value *fastjson.Value) (Schema, error) {
+func translateValueToRecordSchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
 	if !value.Exists("fields") {
 		return nil, ErrInvalidSchema
 	}
@@ -27,17 +27,17 @@ func translateValueToRecordSchema(value *fastjson.Value) (Schema, error) {
 	if err != nil {
 		return nil, ErrInvalidSchema
 	}
+	namespace, name, documentation, aliases, err := translateValueToMetaFields(value)
+	if err != nil {
+		return nil, err
+	}
 	fieldSchemas := make([]RecordFieldSchema, 0, len(fieldValues))
 	for _, fieldValue := range fieldValues {
-		fieldSchema, err := translateValueToRecordFieldSchema(fieldValue)
+		fieldSchema, err := translateValueToRecordFieldSchema(fieldValue, append(additionalTypes, Type(name))...)
 		if err != nil {
 			return nil, err
 		}
 		fieldSchemas = append(fieldSchemas, *fieldSchema)
-	}
-	namespace, name, documentation, aliases, err := translateValueToMetaFields(value)
-	if err != nil {
-		return nil, err
 	}
 	return &RecordSchema{
 		Type:          TypeRecord,

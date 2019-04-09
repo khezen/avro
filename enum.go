@@ -19,7 +19,7 @@ func (t *EnumSchema) TypeName() Type {
 	return TypeEnum
 }
 
-func translateValueToEnumSchema(value *fastjson.Value) (Schema, error) {
+func translateValueToEnumSchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
 
 	return nil, nil
 }

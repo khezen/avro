@@ -14,6 +14,9 @@ func TestMarshaling(t *testing.T) {
 		{
 			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"}]}`),
 			nil,
+		}, {
+			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
+			nil,
 		},
 	}
 	var (

@@ -29,11 +29,11 @@ const (
 	Ignore Order = "ignore"
 )
 
-func translateValueToRecordFieldSchema(value *fastjson.Value) (*RecordFieldSchema, error) {
+func translateValueToRecordFieldSchema(value *fastjson.Value, additionalTypes ...Type) (*RecordFieldSchema, error) {
 	if !value.Exists("type") {
 		return nil, ErrInvalidSchema
 	}
-	anySchema, err := translateValue2AnySchema(value.Get("type"))
+	anySchema, err := translateValue2AnySchema(value.Get("type"), additionalTypes...)
 	if err != nil {
 		return nil, err
 	}

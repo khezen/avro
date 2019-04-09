@@ -15,12 +15,12 @@ func (t *MapSchema) TypeName() Type {
 	return TypeMap
 }
 
-func translateValueToMapSchema(value *fastjson.Value) (Schema, error) {
+func translateValueToMapSchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
 	if !value.Exists("value") {
 		return nil, ErrInvalidSchema
 	}
 	valueVal := value.Get("value")
-	valueSchema, err := translateValue2AnySchema(valueVal)
+	valueSchema, err := translateValue2AnySchema(valueVal, additionalTypes...)
 	if err != nil {
 		return nil, err
 	}

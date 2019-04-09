@@ -19,7 +19,7 @@ func (t *FixedSchema) TypeName() Type {
 	return TypeFixed
 }
 
-func translateValueToFixedSchema(value *fastjson.Value) (Schema, error) {
+func translateValueToFixedSchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
 
 	return nil, nil
 }
