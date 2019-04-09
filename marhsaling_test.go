@@ -110,6 +110,11 @@ func TestMarshaling(t *testing.T) {
 			[]byte(`{"type":"record","name":"LongList","aliases":[0],"fields":[{"name":"value","type":"long"}]}`),
 			ErrInvalidSchema,
 		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"something","name":"something"}`),
+			ErrInvalidSchema,
+		},
 	}
 	var (
 		anySchema        AnySchema
