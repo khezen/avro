@@ -29,11 +29,3 @@ func translateValue2ArraySchema(value *fastjson.Value, additionalTypes ...Type) 
 		Items: itemSchema,
 	}, nil
 }
-
-// NewArraySchema -
-func NewArraySchema(items Schema) *ArraySchema {
-	return &ArraySchema{
-		Type:  TypeArray,
-		Items: items,
-	}
-}

@@ -29,11 +29,3 @@ func translateValueToMapSchema(value *fastjson.Value, additionalTypes ...Type) (
 		Value: valueSchema,
 	}, nil
 }
-
-// NewMapSchema -
-func NewMapSchema(value Schema) *MapSchema {
-	return &MapSchema{
-		Type:  TypeMap,
-		Value: value,
-	}
-}
