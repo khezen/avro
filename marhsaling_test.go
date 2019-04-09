@@ -18,6 +18,26 @@ func TestMarshaling(t *testing.T) {
 			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
 			nil,
 		},
+		// {
+		// 	[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES","HEARTS","DIAMONDS","CLUBS"]}`),
+		// 	nil,
+		// },
+		{
+			[]byte(`{"type":"array","items":"string"}`),
+			nil,
+		},
+		{
+			[]byte(`{"type":"array","items":["null","string"]}`),
+			nil,
+		},
+		{
+			[]byte(`{"type":"map","values":"long"}`),
+			nil,
+		},
+		{
+			[]byte(`{"type":"map","values":["null","long"]}`),
+			nil,
+		},
 	}
 	var (
 		anySchema        AnySchema
@@ -35,7 +55,7 @@ func TestMarshaling(t *testing.T) {
 			panic(err)
 		}
 		if !bytes.EqualFold(schemaBytes, c.schemaBytes) {
-			t.Errorf("expected:\n%v\ngot:\n%v\n", c.schemaBytes, schemaBytes)
+			t.Errorf("expected:\n%s\ngot:\n%s\n", c.schemaBytes, schemaBytes)
 		}
 	}
 }

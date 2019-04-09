@@ -7,7 +7,7 @@ import (
 // MapSchema -
 type MapSchema struct {
 	Type  Type   `json:"type"`
-	Value Schema `json:"value"`
+	Value Schema `json:"values"`
 }
 
 // TypeName -
@@ -16,10 +16,10 @@ func (t *MapSchema) TypeName() Type {
 }
 
 func translateValueToMapSchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
-	if !value.Exists("value") {
+	if !value.Exists("values") {
 		return nil, ErrInvalidSchema
 	}
-	valueVal := value.Get("value")
+	valueVal := value.Get("values")
 	valueSchema, err := translateValue2AnySchema(valueVal, additionalTypes...)
 	if err != nil {
 		return nil, err
