@@ -7,8 +7,8 @@ import (
 // RecordSchema has fields
 type RecordSchema struct {
 	Type          Type                `json:"type"`
-	Name          string              `json:"name"`
 	Namespace     string              `json:"namespace,omitempty"`
+	Name          string              `json:"name"`
 	Aliases       []string            `json:"aliases,omitempty"`
 	Documentation string              `json:"doc,omitempty"`
 	Fields        []RecordFieldSchema `json:"fields"`

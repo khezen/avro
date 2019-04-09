@@ -14,6 +14,11 @@ func TestMarshaling(t *testing.T) {
 	}{
 		{
 			TypeRecord,
+			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"}]}`),
+			nil,
+		},
+		{
+			TypeRecord,
 			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"}]}`),
 			nil,
 		},
@@ -98,6 +103,11 @@ func TestMarshaling(t *testing.T) {
 		{
 			TypeRecord,
 			[]byte(`{"type":"record","name":"LongList","fields":"something"}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","name":"LongList","aliases":[0],"fields":[{"name":"value","type":"long"}]}`),
 			ErrInvalidSchema,
 		},
 	}
