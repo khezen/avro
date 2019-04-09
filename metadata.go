@@ -3,11 +3,12 @@ package avro
 import "github.com/valyala/fastjson"
 
 func translateValueToMetaFields(value *fastjson.Value) (namespace, name, documentation string, aliases []string, err error) {
+	if !value.Exists("name") {
+		return "", "", "", nil, ErrInvalidSchema
+	}
+	name = string(value.GetStringBytes("name"))
 	if value.Exists("namespace") {
 		namespace = string(value.GetStringBytes("namespace"))
-	}
-	if value.Exists("name") {
-		name = string(value.GetStringBytes("name"))
 	}
 	if value.Exists("doc") {
 		documentation = string(value.GetStringBytes("doc"))
