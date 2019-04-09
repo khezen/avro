@@ -1,6 +1,10 @@
 package avro
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/valyala/fastjson"
+)
 
 // UnionSchema - A JSON array, representing a union of embedded types.
 type UnionSchema []Schema
@@ -13,4 +17,9 @@ func (t *UnionSchema) TypeName() Type {
 // MarshalJSON -
 func (t *UnionSchema) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t)
+}
+
+func translateValues2UnionSchema(values []*fastjson.Value) (Schema, error) {
+
+	return nil, nil
 }

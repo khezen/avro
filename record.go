@@ -1,6 +1,10 @@
 package avro
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/valyala/fastjson"
+)
 
 // RecordSchema has fields
 type RecordSchema struct {
@@ -43,4 +47,9 @@ func (t *RecordSchema) TypeName() Type {
 // MarshalJSON -
 func (t *RecordSchema) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t)
+}
+
+func translateValueToRecordSchema(value *fastjson.Value) (Schema, error) {
+
+	return nil, nil
 }

@@ -41,12 +41,12 @@ const (
 	TypeFixed Type = "fixed"
 )
 
-// Name -
-func (t *Type) Name() Type {
-	return *t
+// TypeName -
+func (t Type) TypeName() Type {
+	return t
 }
 
 // MarshalJSON -
-func (t *Type) MarshalJSON() ([]byte, error) {
+func (t Type) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t)
 }
