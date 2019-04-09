@@ -14,7 +14,7 @@ func TestMarshaling(t *testing.T) {
 	}{
 		{
 			TypeRecord,
-			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"}]}`),
+			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"doc":"list of 64 bits integers","fields":[{"name":"value","type":"long"}]}`),
 			nil,
 		},
 		{
