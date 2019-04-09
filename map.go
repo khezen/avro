@@ -23,8 +23,18 @@ func (t *MapSchema) MarshalJSON() ([]byte, error) {
 }
 
 func translateValueToMapSchema(value *fastjson.Value) (Schema, error) {
-
-	return nil, nil
+	if !value.Exists("value") {
+		return nil, ErrInvalidSchema
+	}
+	valueVal := value.Get("value")
+	valueSchema, err := translateValue2AnySchema(valueVal)
+	if err != nil {
+		return nil, err
+	}
+	return &MapSchema{
+		Type:  TypeMap,
+		Value: valueSchema,
+	}, nil
 }
 
 // NewMapSchema -

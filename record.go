@@ -16,29 +16,6 @@ type RecordSchema struct {
 	Fields        []RecordFieldSchema `json:"fields"`
 }
 
-// RecordFieldSchema -
-type RecordFieldSchema struct {
-	Name          string          `json:"name"`
-	Aliases       []string        `json:"aliases,omitempty"`
-	Documentation string          `json:"doc,omitempty"`
-	Type          Schema          `json:"type"`
-	Default       json.RawMessage `json:"default,omitmepty"`
-	Order         Order           `json:"order,omitempty"`
-}
-
-// Order - specifies how this field impacts sort ordering of this record (optional).
-// Valid values are "ascending" (the default), "descending", or "ignore".
-type Order string
-
-const (
-	// Ascending -
-	Ascending Order = "ascending"
-	// Descending -
-	Descending Order = "descending"
-	// Ignore -
-	Ignore Order = "ignore"
-)
-
 // TypeName -
 func (t *RecordSchema) TypeName() Type {
 	return TypeRecord
@@ -50,6 +27,31 @@ func (t *RecordSchema) MarshalJSON() ([]byte, error) {
 }
 
 func translateValueToRecordSchema(value *fastjson.Value) (Schema, error) {
-
-	return nil, nil
+	if !value.Exists("fields") {
+		return nil, ErrInvalidSchema
+	}
+	fieldValues, err := value.Get("fields").Array()
+	if err != nil {
+		return nil, ErrInvalidSchema
+	}
+	fieldSchemas := make([]RecordFieldSchema, 0, len(fieldValues))
+	for _, fieldValue := range fieldValues {
+		fieldSchema, err := translateValueToRecordFieldSchema(fieldValue)
+		if err != nil {
+			return nil, err
+		}
+		fieldSchemas = append(fieldSchemas, *fieldSchema)
+	}
+	namespace, name, documentation, aliases, err := translateValueToMetaFields(value)
+	if err != nil {
+		return nil, err
+	}
+	return &RecordSchema{
+		Type:          TypeRecord,
+		Namespace:     namespace,
+		Name:          name,
+		Aliases:       aliases,
+		Documentation: documentation,
+		Fields:        fieldSchemas,
+	}, nil
 }
