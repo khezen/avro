@@ -38,10 +38,7 @@ func translateValue2AnySchema(value *fastjson.Value, additionalTypes ...Type) (S
 	}
 	isComplex := value.Exists("type")
 	if isComplex {
-		stringBytes, err := value.Get("type").StringBytes()
-		if err != nil {
-			return nil, ErrInvalidSchema
-		}
+		stringBytes := value.GetStringBytes("type")
 		typeName := Type(stringBytes)
 		switch typeName {
 		case TypeArray:
