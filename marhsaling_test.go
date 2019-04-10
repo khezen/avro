@@ -14,12 +14,7 @@ func TestMarshaling(t *testing.T) {
 	}{
 		{
 			TypeRecord,
-			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"doc":"list of 64 bits integers","fields":[{"name":"value","type":"long"}]}`),
-			nil,
-		},
-		{
-			TypeRecord,
-			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"}]}`),
+			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"doc":"list of 64 bits integers","fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
 			nil,
 		},
 		{
@@ -29,22 +24,57 @@ func TestMarshaling(t *testing.T) {
 		},
 		{
 			TypeRecord,
-			[]byte(`{"type":"record","fields":[{"name":"value","type":"long"}]}`),
+			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
+			nil,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long","order":"ignore"},{"name":"next","type":["null","LongList"]}]}`),
+			nil,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long","default":0},{"name":"next","type":["null","LongList"]}]}`),
+			nil,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"something"},{"name":"next","type":["null","LongList"]}]}`),
+			ErrUnsupportedType,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value"},{"name":"next","type":["null","LongList"]}]}`),
 			ErrInvalidSchema,
 		},
 		{
 			TypeRecord,
-			[]byte(`{"type":"record","name":"LongList","fields":[{"type":"long"}]}`),
+			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long","order":"something"},{"name":"next","type":["null","LongList"]}]}`),
 			ErrInvalidSchema,
 		},
 		{
 			TypeRecord,
-			[]byte(`{"type":"record","name":"LongList","aliases":"something","fields":[{"name":"value","type":"long"}]}`),
+			[]byte(`{"type":"record","name":"LongList","aliases":["LinkedLongs"],"fields":[{"name":"value","type":"long","order":0},{"name":"next","type":["null","LongList"]}]}`),
 			ErrInvalidSchema,
 		},
 		{
 			TypeRecord,
-			[]byte(`{"type":"record","name":"LongList","fields":[{"name":"value","aliases":"something","type":"long"}]}`),
+			[]byte(`{"type":"record","fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","name":"LongList","fields":[{"type":"long"},{"name":"next","type":["null","LongList"]}]}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","name":"LongList","aliases":"something","fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeRecord,
+			[]byte(`{"type":"record","name":"LongList","fields":[{"name":"value","aliases":"something","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
 			ErrInvalidSchema,
 		},
 		{
@@ -59,7 +89,7 @@ func TestMarshaling(t *testing.T) {
 		},
 		{
 			TypeRecord,
-			[]byte(`{"type":"record","name":"LongList","aliases":[0],"fields":[{"name":"value","type":"long"}]}`),
+			[]byte(`{"type":"record","name":"LongList","aliases":[0],"fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
 			ErrInvalidSchema,
 		},
 		{

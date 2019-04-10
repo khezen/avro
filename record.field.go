@@ -43,9 +43,12 @@ func translateValueToRecordFieldSchema(value *fastjson.Value, additionalTypes ..
 	)
 	if value.Exists("order") {
 		order = Order(value.GetStringBytes("order"))
+		if order != Ascending && order != Ignore && order != Descending {
+			return nil, ErrInvalidSchema
+		}
 	}
 	if value.Exists("default") {
-		defaultValue = value.GetStringBytes("default")
+		defaultValue = value.Get("default").MarshalTo(defaultValue)
 	}
 	_, name, documentation, aliases, err := translateValueToMetaFields(value)
 	if err != nil {
