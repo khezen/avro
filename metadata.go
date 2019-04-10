@@ -6,12 +6,24 @@ func translateValueToMetaFields(value *fastjson.Value) (namespace, name, documen
 	if !value.Exists("name") {
 		return "", "", "", nil, ErrInvalidSchema
 	}
-	name = string(value.GetStringBytes("name"))
+	nameBytes, err := value.Get("name").StringBytes()
+	if err != nil {
+		return "", "", "", nil, ErrInvalidSchema
+	}
+	name = string(nameBytes)
 	if value.Exists("namespace") {
-		namespace = string(value.GetStringBytes("namespace"))
+		namespaceBytes, err := value.Get("namespace").StringBytes()
+		if err != nil {
+			return "", "", "", nil, ErrInvalidSchema
+		}
+		namespace = string(namespaceBytes)
 	}
 	if value.Exists("doc") {
-		documentation = string(value.GetStringBytes("doc"))
+		documentationBytes, err := value.Get("doc").StringBytes()
+		if err != nil {
+			return "", "", "", nil, ErrInvalidSchema
+		}
+		documentation = string(documentationBytes)
 	}
 	if value.Exists("aliases") {
 		aliasValues, err := value.Get("aliases").Array()

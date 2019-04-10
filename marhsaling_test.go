@@ -127,6 +127,16 @@ func TestMarshaling(t *testing.T) {
 			[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES",11,"DIAMONDS","CLUBS"]}`),
 			ErrInvalidSchema,
 		},
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":"Suit","namespace":0,"symbols":["SPADES"]}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":"Suit","documentation":0,"symbols":["SPADES"]}`),
+			ErrInvalidSchema,
+		},
 		// {
 		// 	[]byte(`{"type":"fixed","size":16,"name":"md5"}`),
 		// 	nil,
