@@ -20,6 +20,31 @@ func (t *EnumSchema) TypeName() Type {
 }
 
 func translateValueToEnumSchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
-
-	return nil, nil
+	if !value.Exists("symbols") {
+		return nil, ErrInvalidSchema
+	}
+	symbolsValues, err := value.Get("symbols").Array()
+	if err != nil {
+		return nil, ErrInvalidSchema
+	}
+	symbolsSchemas := make([]string, 0, len(symbolsValues))
+	for _, symbolValue := range symbolsValues {
+		symbolSchema, err := symbolValue.StringBytes()
+		if err != nil {
+			return nil, ErrInvalidSchema
+		}
+		symbolsSchemas = append(symbolsSchemas, string(symbolSchema))
+	}
+	namespace, name, documentation, aliases, err := translateValueToMetaFields(value)
+	if err != nil {
+		return nil, err
+	}
+	return &EnumSchema{
+		Type:          TypeEnum,
+		Namespace:     namespace,
+		Name:          name,
+		Aliases:       aliases,
+		Documentation: documentation,
+		Symbols:       symbolsSchemas,
+	}, nil
 }

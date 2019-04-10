@@ -47,10 +47,11 @@ func TestMarshaling(t *testing.T) {
 			[]byte(`{"type":"map","values":["null","long"]}`),
 			nil,
 		},
-		// {
-		// 	[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES","HEARTS","DIAMONDS","CLUBS"]}`),
-		// 	nil,
-		// },
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES","HEARTS","DIAMONDS","CLUBS"]}`),
+			nil,
+		},
 		// {
 		// 	[]byte(`{"type":"fixed","size":16,"name":"md5"}`),
 		// 	nil,
@@ -113,7 +114,7 @@ func TestMarshaling(t *testing.T) {
 		{
 			TypeRecord,
 			[]byte(`{"type":"something","name":"something"}`),
-			ErrInvalidSchema,
+			ErrUnsupportedType,
 		},
 	}
 	var (
