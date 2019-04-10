@@ -144,6 +144,11 @@ func TestMarshaling(t *testing.T) {
 		},
 		{
 			TypeFixed,
+			[]byte(`{"type":"fixed","name":"md5"}`),
+			nil,
+		},
+		{
+			TypeFixed,
 			[]byte(`{"type":"fixed","name":"md5","size":"16"}`),
 			ErrInvalidSchema,
 		},
