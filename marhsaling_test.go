@@ -203,6 +203,11 @@ func TestMarshaling(t *testing.T) {
 			ErrUnsupportedType,
 		},
 		{
+			TypeUnion,
+			[]byte(`[0,"string"]`),
+			ErrInvalidSchema,
+		},
+		{
 			Type("something"),
 			[]byte(`{"type":"something","name":"something"}`),
 			ErrUnsupportedType,
