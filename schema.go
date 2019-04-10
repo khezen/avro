@@ -46,11 +46,13 @@ func translateValue2AnySchema(value *fastjson.Value, additionalTypes ...Type) (S
 		case TypeMap:
 			return translateValueToMapSchema(value, additionalTypes...)
 		case TypeEnum:
-			return translateValueToEnumSchema(value, additionalTypes...)
+			return translateValueToEnumSchema(value)
 		case TypeFixed:
-			return translateValueToFixedSchema(value, additionalTypes...)
+			return translateValueToFixedSchema(value)
 		case TypeRecord:
 			return translateValueToRecordSchema(value, additionalTypes...)
+		case TypeBytes, TypeInt32, TypeInt64:
+			return translateValue2PrimitveLogical(value)
 		default:
 			return nil, ErrUnsupportedType
 		}

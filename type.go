@@ -1,5 +1,7 @@
 package avro
 
+import "github.com/valyala/fastjson"
+
 // Type - primitive or derived type name as defined below
 type Type string
 
@@ -39,7 +41,27 @@ const (
 	TypeFixed Type = "fixed"
 )
 
+// LogicalType decorates primitive and complex types to represent a derived type
+type LogicalType string
+
+const (
+	// LogicalTypeDecimal -
+	LogicalTypeDecimal LogicalType = "decimal"
+	// LogicalTypeDate -
+	LogicalTypeDate LogicalType = "date"
+	// LogicalTypeTime -
+	LogicalTypeTime LogicalType = "time"
+	// LogicalTypeTimestamp -
+	LogicalTypeTimestamp LogicalType = "timestamp"
+	// LogialTypeDuration -
+	LogialTypeDuration LogicalType = "duration"
+)
+
 // TypeName -
 func (t Type) TypeName() Type {
 	return t
+}
+
+func translateValue2PrimitveLogical(value *fastjson.Value) (Schema, error) {
+	return nil, nil
 }

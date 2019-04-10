@@ -193,6 +193,21 @@ func TestMarshaling(t *testing.T) {
 			nil,
 		},
 		{
+			TypeFixed,
+			[]byte(`{"type":"fixed","logicalType":"duration","name":"md5","size":12}`),
+			nil,
+		},
+		{
+			TypeFixed,
+			[]byte(`{"type":"fixed","logicalType":"duration","name":"md5","size":16}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeFixed,
+			[]byte(`{"type":"fixed","logicalType":"timestamp","name":"md5","size":12}`),
+			ErrInvalidSchema,
+		},
+		{
 			TypeUnion,
 			[]byte(`["null","string"]`),
 			nil,
