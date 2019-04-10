@@ -28,65 +28,6 @@ func TestMarshaling(t *testing.T) {
 			nil,
 		},
 		{
-			TypeArray,
-			[]byte(`{"type":"array","items":"string"}`),
-			nil,
-		},
-		{
-			TypeArray,
-			[]byte(`{"type":"array","items":["null","string"]}`),
-			nil,
-		},
-		{
-			TypeMap,
-			[]byte(`{"type":"map","values":"long"}`),
-			nil,
-		},
-		{
-			TypeMap,
-			[]byte(`{"type":"map","values":["null","long"]}`),
-			nil,
-		},
-		{
-			TypeEnum,
-			[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES","HEARTS","DIAMONDS","CLUBS"]}`),
-			nil,
-		},
-		{
-			TypeEnum,
-			[]byte(`{"type":"enum","name":"Suit"}`),
-			ErrInvalidSchema,
-		},
-		{
-			TypeEnum,
-			[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES",11,"DIAMONDS","CLUBS"]}`),
-			ErrInvalidSchema,
-		},
-		// {
-		// 	[]byte(`{"type":"fixed","size":16,"name":"md5"}`),
-		// 	nil,
-		// },
-		{
-			TypeUnion,
-			[]byte(`["null","string"]`),
-			nil,
-		},
-		{
-			TypeUnion,
-			[]byte(`["something","string"]`),
-			ErrUnsupportedType,
-		},
-		{
-			TypeMap,
-			[]byte(`{"type":"map","items":"long"}`),
-			ErrInvalidSchema,
-		},
-		{
-			TypeArray,
-			[]byte(`{"type":"array","values":"long"}`),
-			ErrInvalidSchema,
-		},
-		{
 			TypeRecord,
 			[]byte(`{"type":"record","fields":[{"name":"value","type":"long"}]}`),
 			ErrInvalidSchema,
@@ -122,7 +63,86 @@ func TestMarshaling(t *testing.T) {
 			ErrInvalidSchema,
 		},
 		{
-			TypeRecord,
+			TypeArray,
+			[]byte(`{"type":"array","items":"string"}`),
+			nil,
+		},
+		{
+			TypeArray,
+			[]byte(`{"type":"array","items":["null","string"]}`),
+			nil,
+		},
+		{
+			TypeArray,
+			[]byte(`{"type":"array","values":"long"}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeArray,
+			[]byte(`{"type":"array","items":"something"}`),
+			ErrUnsupportedType,
+		},
+		{
+			TypeMap,
+			[]byte(`{"type":"map","values":"long"}`),
+			nil,
+		},
+		{
+			TypeMap,
+			[]byte(`{"type":"map","values":["null","long"]}`),
+			nil,
+		},
+		{
+			TypeMap,
+			[]byte(`{"type":"map","values":["null","something"]}`),
+			ErrUnsupportedType,
+		},
+		{
+			TypeMap,
+			[]byte(`{"type":"map","items":"long"}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES","HEARTS","DIAMONDS","CLUBS"]}`),
+			nil,
+		},
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":"Suit"}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":"Suit","symbols":"something"}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":0,"symbols":"something"}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeEnum,
+			[]byte(`{"type":"enum","name":"Suit","symbols":["SPADES",11,"DIAMONDS","CLUBS"]}`),
+			ErrInvalidSchema,
+		},
+		// {
+		// 	[]byte(`{"type":"fixed","size":16,"name":"md5"}`),
+		// 	nil,
+		// },
+		{
+			TypeUnion,
+			[]byte(`["null","string"]`),
+			nil,
+		},
+		{
+			TypeUnion,
+			[]byte(`["something","string"]`),
+			ErrUnsupportedType,
+		},
+		{
+			Type("something"),
 			[]byte(`{"type":"something","name":"something"}`),
 			ErrUnsupportedType,
 		},
