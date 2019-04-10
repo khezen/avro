@@ -4,7 +4,6 @@
 [![Build Status](http://img.shields.io/travis/khezen/avro.svg?style=flat-square)](https://travis-ci.org/khezen/avro) [![codecov](https://img.shields.io/codecov/c/github/khezen/avro/master.svg?style=flat-square)](https://codecov.io/gh/khezen/avro)
 [![Go Report Card](https://goreportcard.com/badge/github.com/khezen/avro?style=flat-square)](https://goreportcard.com/report/github.com/khezen/avro)
 
-
 ## Issues
 
 If you have any problems or questions, please ask for help through a [GitHub issue](https://github.com/khezen/avro/issues).
