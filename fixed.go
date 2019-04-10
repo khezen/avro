@@ -17,6 +17,9 @@ type FixedSchema struct {
 
 // TypeName -
 func (t *FixedSchema) TypeName() Type {
+	if len(t.LogicalType) > 0 {
+		return Type(t.LogicalType)
+	}
 	return TypeFixed
 }
 
