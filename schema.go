@@ -52,7 +52,7 @@ func translateValue2AnySchema(value *fastjson.Value, additionalTypes ...Type) (S
 		case TypeRecord:
 			return translateValueToRecordSchema(value, additionalTypes...)
 		case TypeBytes, TypeInt32, TypeInt64:
-			return translateValue2PrimitveLogical(value)
+			return translateValue2DerivedPrimitiveSchema(typeName, value)
 		default:
 			return nil, ErrUnsupportedType
 		}

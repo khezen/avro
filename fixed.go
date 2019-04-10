@@ -28,6 +28,9 @@ func translateValueToFixedSchema(value *fastjson.Value) (Schema, error) {
 	if err != nil {
 		return nil, ErrInvalidSchema
 	}
+	if size < 0 {
+		return nil, ErrInvalidSchema
+	}
 	namespace, name, documentation, aliases, err := translateValueToMetaFields(value)
 	if err != nil {
 		return nil, err

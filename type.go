@@ -1,7 +1,5 @@
 package avro
 
-import "github.com/valyala/fastjson"
-
 // Type - primitive or derived type name as defined below
 type Type string
 
@@ -60,8 +58,4 @@ const (
 // TypeName -
 func (t Type) TypeName() Type {
 	return t
-}
-
-func translateValue2PrimitveLogical(value *fastjson.Value) (Schema, error) {
-	return nil, nil
 }
