@@ -58,7 +58,8 @@ func main() {
           ]
         }
       ]
-    }`)
+    }`,
+  )
 
   // Unmarshal JSON  bytes to Schema interface
   var anySchema avro.AnySchema

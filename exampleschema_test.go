@@ -10,28 +10,28 @@ import (
 func ExampleSchema() {
 	schemaBytes := []byte(
 		`{
-		"type": "record",
-		"namespace": "test",
-		"name": "LongList",
-		"aliases": [
-			"LinkedLongs"
-		],
-		"doc": "linked list of 64 bits integers",
-		"fields": [
-			{
-				"name": "value",
-				"type": "long"
-			},
-			{
-				"name": "next",
-				"type": [
-					"null",
-					"LongList"
-				]
-			}
-		]
-	}`)
-
+			"type": "record",
+			"namespace": "test",
+			"name": "LongList",
+			"aliases": [
+				"LinkedLongs"
+			],
+			"doc": "linked list of 64 bits integers",
+			"fields": [
+				{
+					"name": "value",
+					"type": "long"
+				},
+				{
+					"name": "next",
+					"type": [
+						"null",
+						"LongList"
+					]
+				}
+			]
+		}`,
+	)
 	// Unmarshal JSON  bytes to Schema interface
 	var anySchema avro.AnySchema
 	err := json.Unmarshal(schemaBytes, &anySchema)
