@@ -137,10 +137,26 @@ func TestMarshaling(t *testing.T) {
 			[]byte(`{"type":"enum","name":"Suit","doc":0,"symbols":["SPADES"]}`),
 			ErrInvalidSchema,
 		},
-		// {
-		// 	[]byte(`{"type":"fixed","size":16,"name":"md5"}`),
-		// 	nil,
-		// },
+		{
+			TypeFixed,
+			[]byte(`{"type":"fixed","name":"md5","size":16}`),
+			nil,
+		},
+		{
+			TypeFixed,
+			[]byte(`{"type":"fixed","name":"md5","size":"16"}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeFixed,
+			[]byte(`{"type":"fixed","name":0}`),
+			ErrInvalidSchema,
+		},
+		{
+			TypeFixed,
+			[]byte(`{"type":"fixed","name":"md5","size":16}`),
+			nil,
+		},
 		{
 			TypeUnion,
 			[]byte(`["null","string"]`),

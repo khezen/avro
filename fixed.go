@@ -20,6 +20,23 @@ func (t *FixedSchema) TypeName() Type {
 }
 
 func translateValueToFixedSchema(value *fastjson.Value, additionalTypes ...Type) (Schema, error) {
-
-	return nil, nil
+	if !value.Exists("size") {
+		return nil, ErrInvalidSchema
+	}
+	size, err := value.Get("size").Int()
+	if err != nil {
+		return nil, ErrInvalidSchema
+	}
+	namespace, name, documentation, aliases, err := translateValueToMetaFields(value)
+	if err != nil {
+		return nil, err
+	}
+	return &FixedSchema{
+		Type:          TypeFixed,
+		Namespace:     namespace,
+		Name:          name,
+		Aliases:       aliases,
+		Documentation: documentation,
+		Size:          size,
+	}, nil
 }
