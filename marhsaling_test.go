@@ -119,7 +119,7 @@ func TestMarshaling(t *testing.T) {
 		},
 		{
 			TypeEnum,
-			[]byte(`{"type":"enum","name":0,"symbols":"something"}`),
+			[]byte(`{"type":"enum","name":0,"symbols":["SPADES"]}`),
 			ErrInvalidSchema,
 		},
 		{
