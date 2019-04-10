@@ -40,7 +40,7 @@ const (
 )
 
 // LogicalType decorates primitive and complex types to represent a derived type
-type LogicalType string
+type LogicalType Type
 
 const (
 	// LogicalTypeDecimal -

@@ -12,7 +12,7 @@ type DerivedPrimitiveSchema struct {
 
 // TypeName -
 func (t *DerivedPrimitiveSchema) TypeName() Type {
-	return t.Type
+	return Type(t.LogicalType)
 }
 
 func translateValue2DerivedPrimitiveSchema(typeName Type, value *fastjson.Value) (Schema, error) {
