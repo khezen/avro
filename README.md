@@ -1,10 +1,24 @@
 # *avro*
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro)
 [![Build Status](http://img.shields.io/travis/khezen/avro.svg?style=flat-square)](https://travis-ci.org/khezen/avro) [![codecov](https://img.shields.io/codecov/c/github/khezen/avro/master.svg?style=flat-square)](https://codecov.io/gh/khezen/avro)
 [![Go Report Card](https://goreportcard.com/badge/github.com/khezen/avro?style=flat-square)](https://goreportcard.com/report/github.com/khezen/avro)
 
 The purpose of this package is to facilitate use of AVRO with `go` strong typing.
+
+## Features:
+
+### `github.com/khezen/avro`
+
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro)
+
+* Marshal/Unmarshal AVRO schema
+
+### `github.com/khezen/avro/sqlavro`
+
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/sqlavro)
+
+* discover SQL tables 
+* Convert SQL schema to AVRO schema
 
 ## What is AVRO
 
