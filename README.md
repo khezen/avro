@@ -17,7 +17,7 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/sqlavro)
 
-* discover SQL tables 
+* Discover SQL tables 
 * Convert SQL schema to AVRO schema
 
 ## What is AVRO
@@ -26,10 +26,10 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 It provides:
 
-* rich data structures,
-* a compact, fast, binary data format,
-* a container file, to store persistent data,
-* remote procedure call (RPC)
+* Rich data structures
+* A compact, fast, binary data format
+* A container file, to store persistent data
+* Remote procedure call (RPC)
 
 AVRO binary encoded data comes together with its schema and therefore is fully self-describing.
 
