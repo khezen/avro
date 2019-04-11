@@ -9,8 +9,12 @@ const (
 
 	// Char -
 	Char SQLType = "char"
+	// NChar -
+	NChar SQLType = "nchar"
 	// VarChar -
 	VarChar SQLType = "varchar"
+	// NVarChar -
+	NVarChar SQLType = "nvarchar"
 	// Text -
 	Text SQLType = "text"
 	// TinyText -
