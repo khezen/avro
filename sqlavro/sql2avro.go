@@ -112,7 +112,13 @@ func renderField(columnName string, dataType SQLType, isNullable bool, defaultVa
 		fieldType avro.Schema
 	)
 	switch dataType {
-	case Char, NChar, VarChar, NVarChar,
+	case Char, NChar:
+		fieldType = &avro.FixedSchema{
+			Type: avro.TypeFixed,
+			Size: charBytesLen,
+		}
+		break
+	case VarChar, NVarChar,
 		Text, TinyText, MediumText, LongText,
 		Enum:
 		fieldType = avro.TypeString
