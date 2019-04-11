@@ -14,6 +14,11 @@ func TestMarshaling(t *testing.T) {
 	}{
 		{
 			TypeRecord,
+			[]byte(`{"type":"record","name":"person","fields":[{"name":"id","type":"int"},{"name":"guid","type":"string"},{"name":"isActive","type":"boolean"},{"name":"age","type":"int"},{"name":"name","type":"string"},{"name":"address","type":"string"},{"name":"latitude","type":"double"},{"name":"longitude","type":"double"},{"name":"tags","type":{"type":"array","items":"string"}},{"name":"friends","type":{"type":"array","items":{"type":"record","name":"friends_record","fields":[{"name":"id","type":"int"},{"name":"name","type":"string"}]}}},{"name":"randomArrayItem","type":"string"}]}`),
+			nil,
+		},
+		{
+			TypeRecord,
 			[]byte(`{"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"doc":"list of 64 bits integers","fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}`),
 			nil,
 		},
@@ -376,7 +381,7 @@ func TestMarshaling(t *testing.T) {
 	for i, c := range cases {
 		err := json.Unmarshal(c.schemaBytes, &anySchema)
 		if err != nil && err != c.expectedErr {
-			panic(err)
+			t.Errorf("case %d - error %v, got %v", i, c.expectedErr, err)
 		}
 		if err != nil {
 			continue
@@ -387,7 +392,8 @@ func TestMarshaling(t *testing.T) {
 		}
 		schemaBytes, err = json.Marshal(underlyingSchema)
 		if err != nil {
-			panic(err)
+			t.Errorf("case %d - error %v, got %v", i, c.expectedErr, err)
+			continue
 		}
 		if !bytes.EqualFold(schemaBytes, c.schemaBytes) {
 			t.Errorf("case %d -\nexpected:\n%s\ngot:\n%s\n", i, c.schemaBytes, schemaBytes)

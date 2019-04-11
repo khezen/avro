@@ -46,6 +46,14 @@ func TestSQL2AVRO(t *testing.T) {
 			[]driver.Value{"time", "TIME", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"datetime", "DATETIME", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"timestamp", "TIMESTAMP", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			// blog post fields example
+			[]driver.Value{"ID", "INT", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"title", "VARCHAR", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 384}},
+			[]driver.Value{"body", "LONGBLOB", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 4294967295}},
+			[]driver.Value{"content_type", "VARCHAR", "YES", sql.NullString{Valid: true, String: "text/markdown; charset=UTF-8"}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 384}},
+			[]driver.Value{"post_date", "DATETIME", "NO", sql.NullString{Valid: true, String: "CURRENT_TIMESTAMP"}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"update_date", "DATETIME", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"reading_time_minutes", "DECIMAL", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 3}, sql.NullInt64{Valid: true, Int64: 1}, sql.NullInt64{Valid: false}},
 		}
 	)
 	for _, rowValues := range tableRowsValues {
@@ -71,7 +79,7 @@ func TestSQL2AVRO(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	expectedSchemas := []byte(`[{"type":"record","namespace":"dbTest","name":"table1","fields":[{"name":"some_char","type":{"type":"fixed","name":"","size":108}},{"name":"some_varchar","type":"string"},{"name":"some_bolb","type":["null","bytes"]},{"name":"some_int","type":"int","default":18},{"name":"some_bigint","type":"long"},{"name":"some_float","type":"float"},{"name":"some_double","type":"double"},{"name":"some_decimal","type":{"type":"bytes","logicalType":"decimal","precision":8,"scale":12}},{"name":"date","type":{"type":"int","logicalType":"date"}},{"name":"time","type":{"type":"int","logicalType":"time"}},{"name":"datetime","type":{"type":"int","logicalType":"timestamp"}},{"name":"timestamp","type":{"type":"int","logicalType":"timestamp"}}]}]`)
+	expectedSchemas := []byte(`[{"type":"record","namespace":"dbTest","name":"table1","fields":[{"name":"some_char","type":{"type":"fixed","name":"some_char","size":108}},{"name":"some_varchar","type":"string"},{"name":"some_bolb","type":["null","bytes"]},{"name":"some_int","type":"int","default":18},{"name":"some_bigint","type":"long"},{"name":"some_float","type":"float"},{"name":"some_double","type":"double"},{"name":"some_decimal","type":{"type":"bytes","logicalType":"decimal","precision":8,"scale":12}},{"name":"date","type":{"type":"int","logicalType":"date"}},{"name":"time","type":{"type":"int","logicalType":"time"}},{"name":"datetime","type":{"type":"int","logicalType":"timestamp"}},{"name":"timestamp","type":{"type":"int","logicalType":"timestamp"}},{"name":"ID","type":"int"},{"name":"title","type":"string"},{"name":"body","type":"bytes"},{"name":"content_type","type":["null","string"],"default":"text/markdown; charset=UTF-8"},{"name":"post_date","type":{"type":"int","logicalType":"timestamp"},"default":"CURRENT_TIMESTAMP"},{"name":"update_date","type":["null",{"type":"int","logicalType":"timestamp"}]},{"name":"reading_time_minutes","type":["null",{"type":"bytes","logicalType":"decimal","precision":3,"scale":1}]}]}]`)
 	if !bytes.EqualFold(schemasBytes, expectedSchemas) {
 		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expectedSchemas), string(schemasBytes))
 	}

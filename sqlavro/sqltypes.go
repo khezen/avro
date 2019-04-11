@@ -31,6 +31,8 @@ const (
 	LongBlob SQLType = "longblob"
 	// Enum -
 	Enum SQLType = "enum"
+	// Set -
+	Set SQLType = "set"
 
 	// Number types
 

@@ -48,4 +48,25 @@ func ExampleSchema() {
 	fmt.Println(string(schemaBytes))
 }
 
-// {"type":"record","namespace":"test","name":"LongList","aliases":["LinkedLongs"],"doc":"linked list of 64 bits integers","fields":[{"name":"value","type":"long"},{"name":"next","type":["null","LongList"]}]}
+// {
+//     "type": "record",
+//     "namespace": "test",
+//     "name": "LongList",
+//     "aliases": [
+//         "LinkedLongs"
+//     ],
+//     "doc": "linked list of 64 bits integers",
+//     "fields": [
+//         {
+//             "name": "value",
+//             "type": "long"
+//         },
+//         {
+//             "name": "next",
+//             "type": [
+//                 "null",
+//                 "LongList"
+//             ]
+//         }
+//     ]
+// }
