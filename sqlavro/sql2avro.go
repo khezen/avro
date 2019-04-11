@@ -2,6 +2,7 @@ package sqlavro
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/khezen/avro"
 )
@@ -83,12 +84,15 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 		if err != nil {
 			return nil, err
 		}
-		isNullable = isNullableStr == "YES"
+		dataType = strings.ToLower(dataType)
+		isNullableStr = strings.ToLower(isNullableStr)
+		isNullable = isNullableStr == "yes"
 		if defaultValue.Valid {
 			defaultValueBytes = []byte(defaultValue.String)
 		} else {
 			defaultValueBytes = nil
 		}
+
 		field, err := renderField(columnName, SQLType(dataType), isNullable, defaultValueBytes, int(numPrecision.Int64), int(numScale.Int64), int(charBytesLen.Int64))
 		if err != nil {
 			return nil, err
@@ -154,6 +158,8 @@ func renderField(columnName string, dataType SQLType, isNullable bool, defaultVa
 			LogicalType: avro.LogicalTypeTimestamp,
 		}
 		break
+	default:
+		return nil, avro.ErrUnsupportedType
 	}
 	if isNullable {
 		fieldType = avro.UnionSchema([]avro.Schema{avro.TypeNull, fieldType})

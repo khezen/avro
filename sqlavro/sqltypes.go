@@ -56,7 +56,7 @@ const (
 	// Date -
 	Date SQLType = "date"
 	// DateTime -
-	DateTime SQLType = "datetype"
+	DateTime SQLType = "datetime"
 	// Timestamp -
 	Timestamp SQLType = "timestamp"
 	// Time -

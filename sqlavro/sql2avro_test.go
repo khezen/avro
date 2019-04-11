@@ -1,10 +1,10 @@
 package sqlavro
 
 import (
+	"bytes"
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -34,7 +34,17 @@ func TestSQL2AVRO(t *testing.T) {
 		}
 		mockFieldRows   = sqlmock.NewRows(fieldColumns)
 		fieldRowsValues = [][]driver.Value{
-			[]driver.Value{"uuid", "char", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 108}},
+			[]driver.Value{"some_char", "CHAR", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 108}},
+			[]driver.Value{"some_bolb", "LONGBLOB", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 4294967295}},
+			[]driver.Value{"some_int", "INT", "NO", sql.NullInt64{Valid: true, Int64: 18}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"some_bigint", "BIGINT", "NO", sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"some_float", "FLOAT", "NO", sql.NullFloat64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"some_double", "DOUBLE", "NO", sql.NullFloat64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"some_decimal", "DECIMAL", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 8}, sql.NullInt64{Valid: true, Int64: 12}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"date", "DATE", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"time", "TIME", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"datetime", "DATETIME", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"timestamp", "TIMESTAMP", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 		}
 	)
 	for _, rowValues := range tableRowsValues {
@@ -60,5 +70,8 @@ func TestSQL2AVRO(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(schemasBytes))
+	expectedSchemas := []byte(`[{"type":"record","namespace":"dbTest","name":"table1","fields":[{"name":"some_char","type":"string"},{"name":"some_bolb","type":["null","bytes"]},{"name":"some_int","type":"int","default":18},{"name":"some_bigint","type":"long"},{"name":"some_float","type":"float"},{"name":"some_double","type":"double"},{"name":"some_decimal","type":{"type":"bytes","logicalType":"decimal","precision":8,"scale":12}},{"name":"date","type":{"type":"int","logicalType":"date"}},{"name":"time","type":{"type":"int","logicalType":"time"}},{"name":"datetime","type":{"type":"int","logicalType":"timestamp"}},{"name":"timestamp","type":{"type":"int","logicalType":"timestamp"}}]}]`)
+	if !bytes.EqualFold(schemasBytes, expectedSchemas) {
+		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expectedSchemas), string(schemasBytes))
+	}
 }
