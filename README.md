@@ -187,8 +187,7 @@ func main() {
 //                 "type": {
 //                     "type": "int",
 //                     "logicalType": "timestamp"
-//                 },
-//                 "default": "CURRENT_TIMESTAMP"
+//                 }
 //             },
 //             {
 //                 "name": "update_date",

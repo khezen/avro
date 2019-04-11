@@ -71,8 +71,7 @@ func exampleSQLDatabase2Avro() {
 //                 "type": {
 //                     "type": "int",
 //                     "logicalType": "timestamp"
-//                 },
-//                 "default": "CURRENT_TIMESTAMP"
+//                 }
 //             },
 //             {
 //                 "name": "update_date",

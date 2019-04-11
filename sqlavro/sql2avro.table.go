@@ -2,7 +2,6 @@ package sqlavro
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 
 	"github.com/khezen/avro"
@@ -52,7 +51,6 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 			return nil, err
 		}
 		fields = append(fields, *field)
-		fmt.Println(string(field.Default))
 	}
 	return &avro.RecordSchema{
 		Type:      avro.TypeRecord,
