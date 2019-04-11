@@ -18,7 +18,7 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/sqlavro)
 
 * Discover SQL tables 
-* Convert SQL schema to AVRO schema
+* Convert SQL tables to AVRO schemas
 
 ## What is AVRO
 
