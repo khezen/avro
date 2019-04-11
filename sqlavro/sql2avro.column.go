@@ -91,6 +91,9 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 				format = "2006-01-02 15:04:05"
 			}
 			t, err := time.Parse(format, string(defaultValue))
+			if dataType == Time {
+				t = t.AddDate(1970, 0, 0)
+			}
 			if err != nil {
 				defaultValue = []byte(fmt.Sprintf(`"%s"`, string(defaultValue)))
 			} else {
