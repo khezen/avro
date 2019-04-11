@@ -113,7 +113,7 @@ func main() {
 // }
 ```
 
-### Convert SQL Schema to AVRO Schema
+### Convert SQL Table to AVRO Schema
 
 ```golang
 import (
