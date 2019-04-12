@@ -7,7 +7,7 @@ import (
 	"github.com/khezen/avro"
 )
 
-// SQLTable2AVRO -
+// SQLTable2AVRO - transalte the given SQL table to AVRO schema
 func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, error) {
 	rows, err := db.Query(
 		`SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_OCTET_LENGTH

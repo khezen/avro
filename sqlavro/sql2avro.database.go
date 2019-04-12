@@ -6,9 +6,9 @@ import (
 	"github.com/khezen/avro"
 )
 
-// SQLDatabase2AVRO -
+// SQLDatabase2AVRO - fetch all tables of the given SQL database and translate them to avro schemas
 func SQLDatabase2AVRO(db *sql.DB, dbName string) ([]avro.Schema, error) {
-	tables, err := getTables(db, dbName)
+	tables, err := GetTables(db, dbName)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,8 @@ func SQLDatabase2AVRO(db *sql.DB, dbName string) ([]avro.Schema, error) {
 	return schemas, nil
 }
 
-func getTables(db *sql.DB, dbName string) ([]string, error) {
+// GetTables - returns table names of the given database
+func GetTables(db *sql.DB, dbName string) ([]string, error) {
 	rows, err := db.Query(
 		`SELECT TABLE_NAME 
 		 FROM INFORMATION_SCHEMA.TABLES 
