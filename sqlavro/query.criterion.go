@@ -92,12 +92,32 @@ func NewCriterionString(fieldName string, limit string, order avro.Order) *Crite
 	}
 }
 
-// NewCriterionTime -
-func NewCriterionTime(fieldName string, limit time.Time, order avro.Order) *Criterion {
+// NewCriterionDateTime -
+func NewCriterionDateTime(fieldName string, limit time.Time, order avro.Order) *Criterion {
 	return &Criterion{
 		FieldName: fieldName,
 		Type:      avro.Type(avro.LogicalTypeTimestamp),
 		RawLimit:  []byte(limit.Format(time.RFC3339Nano)),
+		Order:     order,
+	}
+}
+
+// NewCriterionDate -
+func NewCriterionDate(fieldName string, limit time.Time, order avro.Order) *Criterion {
+	return &Criterion{
+		FieldName: fieldName,
+		Type:      avro.Type(avro.LogicalTypeDate),
+		RawLimit:  []byte(limit.Format(SQLDateFormat)),
+		Order:     order,
+	}
+}
+
+// NewCriterionTime -
+func NewCriterionTime(fieldName string, limit time.Time, order avro.Order) *Criterion {
+	return &Criterion{
+		FieldName: fieldName,
+		Type:      avro.Type(avro.LogicalTypeTime),
+		RawLimit:  []byte(limit.Format(SQLTimeFormat)),
 		Order:     order,
 	}
 }
