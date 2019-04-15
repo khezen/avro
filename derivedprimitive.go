@@ -4,10 +4,11 @@ import "github.com/valyala/fastjson"
 
 // DerivedPrimitiveSchema -
 type DerivedPrimitiveSchema struct {
-	Type        Type        `json:"type"`
-	LogicalType LogicalType `json:"logicalType"`
-	Precision   *int        `json:"precision,omitempty"`
-	Scale       *int        `json:"scale,omitempty"`
+	Type          Type        `json:"type"`
+	Documentation string      `json:"doc,omitempty"`
+	LogicalType   LogicalType `json:"logicalType"`
+	Precision     *int        `json:"precision,omitempty"`
+	Scale         *int        `json:"scale,omitempty"`
 }
 
 // TypeName -
@@ -19,14 +20,19 @@ func translateValue2DerivedPrimitiveSchema(typeName Type, value *fastjson.Value)
 	if !value.Exists("logicalType") {
 		return nil, ErrInvalidSchema
 	}
+	doc, err := translateValueToDocumentation(value)
+	if err != nil {
+		return nil, err
+	}
 	logicalType := LogicalType(value.GetStringBytes("logicalType"))
 	switch logicalType {
 	case LogicalTypeDate, LogicalTypeTime, LogicalTypeTimestamp:
 		switch typeName {
 		case TypeInt32, TypeInt64:
 			return &DerivedPrimitiveSchema{
-				Type:        typeName,
-				LogicalType: logicalType,
+				Type:          typeName,
+				Documentation: doc,
+				LogicalType:   logicalType,
 			}, nil
 		default:
 			return nil, ErrInvalidSchema
@@ -54,10 +60,11 @@ func translateValue2DerivedPrimitiveSchema(typeName Type, value *fastjson.Value)
 			scale = &scaleInt
 		}
 		return &DerivedPrimitiveSchema{
-			Type:        typeName,
-			LogicalType: logicalType,
-			Precision:   &precision,
-			Scale:       scale,
+			Type:          typeName,
+			Documentation: doc,
+			LogicalType:   logicalType,
+			Precision:     &precision,
+			Scale:         scale,
 		}, nil
 	default:
 		return nil, ErrInvalidSchema
