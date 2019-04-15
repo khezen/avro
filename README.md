@@ -186,6 +186,7 @@ func main() {
 //                 "name": "post_date",
 //                 "type": {
 //                     "type": "int",
+//                     "doc":"datetime",
 //                     "logicalType": "timestamp"
 //                 }
 //             },
@@ -195,6 +196,7 @@ func main() {
 //                     "null",
 //                     {
 //                         "type": "int",
+//                         "doc":"datetime",
 //                         "logicalType": "timestamp"
 //                     }
 //                 ]

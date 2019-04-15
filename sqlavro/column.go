@@ -60,10 +60,18 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 			LogicalType: avro.LogicalTypeTime,
 		}
 		break
-	case DateTime, Timestamp:
+	case DateTime:
 		fieldType = &avro.DerivedPrimitiveSchema{
-			Type:        avro.TypeInt32,
-			LogicalType: avro.LogicalTypeTimestamp,
+			Type:          avro.TypeInt32,
+			Documentation: string(DateTime),
+			LogicalType:   avro.LogicalTypeTimestamp,
+		}
+		break
+	case Timestamp:
+		fieldType = &avro.DerivedPrimitiveSchema{
+			Type:          avro.TypeInt32,
+			Documentation: string(Timestamp),
+			LogicalType:   avro.LogicalTypeTimestamp,
 		}
 		break
 	default:

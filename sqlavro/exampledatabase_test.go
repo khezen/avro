@@ -70,6 +70,7 @@ func exampleSQLDatabase2Avro() {
 //                 "name": "post_date",
 //                 "type": {
 //                     "type": "int",
+//                     "doc":"datetime",
 //                     "logicalType": "timestamp"
 //                 }
 //             },
@@ -79,6 +80,7 @@ func exampleSQLDatabase2Avro() {
 //                     "null",
 //                     {
 //                         "type": "int",
+//                         "doc":"datetime",
 //                         "logicalType": "timestamp"
 //                     }
 //                 ]
