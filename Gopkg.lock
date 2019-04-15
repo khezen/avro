@@ -2,23 +2,47 @@
 
 
 [[projects]]
+  digest = "1:c84a587136cb69cecc11f3dbe9f9001444044c0dba74997b07f7e4c150b07cda"
   name = "github.com/DATA-DOG/go-sqlmock"
   packages = ["."]
+  pruneopts = "UT"
   revision = "3f9954f6f6697845b082ca57995849ddf614f450"
   version = "v1.3.3"
 
 [[projects]]
+  branch = "master"
+  digest = "1:e4f5819333ac698d294fe04dbf640f84719658d5c7ce195b10060cc37292ce79"
+  name = "github.com/golang/snappy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2a8bb927dd31d8daada140a5d09578521ce5c36a"
+
+[[projects]]
+  digest = "1:6ff6c3cb744b42df69cb874c3f19d387ece7ba7998e7d4de811c9bf61a7b1a09"
+  name = "github.com/linkedin/goavro"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "af12b3c46392134a7db8c1a8b6c6a33419fab0ea"
+  version = "v2.7.2"
+
+[[projects]]
+  digest = "1:f95b469161aa3bf30d515403ca1593f566e9d877f1c02479038ce55207118bf5"
   name = "github.com/valyala/fastjson"
   packages = [
     ".",
-    "fastfloat"
+    "fastfloat",
   ]
+  pruneopts = "UT"
   revision = "73ca3ce4bcd1cb08f60e48df25675b80c6a4e51e"
   version = "v1.4.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7f49d38955a1e8307743dcbcb5ace51b53528643ace116471a78ab42fd9d6b75"
+  input-imports = [
+    "github.com/DATA-DOG/go-sqlmock",
+    "github.com/linkedin/goavro",
+    "github.com/valyala/fastjson",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
