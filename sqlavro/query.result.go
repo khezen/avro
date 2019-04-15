@@ -2,6 +2,7 @@ package sqlavro
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/khezen/avro"
 )
@@ -32,9 +33,20 @@ func renderSQLField(schema avro.Schema) (interface{}, error) {
 	case avro.TypeFloat32:
 		var field float32
 		return &field, nil
-	case avro.TypeString, avro.Type(avro.LogicalTypeDate), avro.Type(avro.LogicalTypeTime), avro.Type(avro.LogicalTypeTimestamp):
+	case avro.TypeString, avro.Type(avro.LogicalTypeDate), avro.Type(avro.LogicalTypeTime):
 		var field string
 		return &field, nil
+	case avro.Type(avro.LogicalTypeTimestamp):
+		switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
+		case string(DateTime):
+			var field string
+			return &field, nil
+		case "", string(Timestamp):
+			var field int32
+			return &field, nil
+		default:
+			return nil, ErrUnsupportedTypeForSQL
+		}
 	case avro.TypeBytes, avro.TypeFixed, avro.Type(avro.LogicalTypeDecimal):
 		var field []byte
 		return &field, nil
@@ -62,9 +74,20 @@ func renderSQLField(schema avro.Schema) (interface{}, error) {
 		case avro.TypeInt32, avro.TypeInt64:
 			var field sql.NullInt64
 			return &field, nil
-		case avro.TypeString, avro.Type(avro.LogicalTypeDate), avro.Type(avro.LogicalTypeTime), avro.Type(avro.LogicalTypeTimestamp):
+		case avro.TypeString, avro.Type(avro.LogicalTypeDate), avro.Type(avro.LogicalTypeTime):
 			var field sql.NullString
 			return &field, nil
+		case avro.Type(avro.LogicalTypeTimestamp):
+			switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
+			case string(DateTime):
+				var field sql.NullString
+				return &field, nil
+			case "", string(Timestamp):
+				var field sql.NullInt64
+				return &field, nil
+			default:
+				return nil, ErrUnsupportedTypeForSQL
+			}
 		case avro.TypeBytes, avro.TypeFixed, avro.Type(avro.LogicalTypeDecimal):
 			var field []byte
 			return &field, nil
@@ -93,11 +116,33 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 	case avro.TypeInt32:
 		return *sqlField.(*int32), nil
 	case avro.Type(avro.LogicalTypeDate):
-		// TODO
+		timeStr := *sqlField.(*string)
+		t, err := time.Parse(SQLDateFormat, timeStr)
+		if err != nil {
+			return nil, err
+		}
+		return int32(t.Unix()), nil
 	case avro.Type(avro.LogicalTypeTime):
-		// TODO
+		timeStr := *sqlField.(*string)
+		t, err := time.Parse(SQLTimeFormat, timeStr)
+		if err != nil {
+			return nil, err
+		}
+		return int32(t.Unix()), nil
 	case avro.Type(avro.LogicalTypeTimestamp):
-		// TODO
+		switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
+		case string(DateTime):
+			timeStr := *sqlField.(*string)
+			t, err := time.Parse(SQLDateTimeFormat, timeStr)
+			if err != nil {
+				return nil, err
+			}
+			return int32(t.Unix()), nil
+		case "", string(Timestamp):
+			return *sqlField.(*int32), nil
+		default:
+			return nil, ErrUnsupportedTypeForSQL
+		}
 	case avro.TypeFloat64:
 		return *sqlField.(*float64), nil
 	case avro.TypeFloat32:
@@ -136,6 +181,47 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 				return map[string]interface{}{string(typeName): int32(nullableField.Int64)}, nil
 			}
 			return nil, nil
+		case avro.Type(avro.LogicalTypeDate):
+			nullableField := sqlField.(*sql.NullString)
+			if nullableField.Valid {
+				t, err := time.Parse(SQLDateFormat, nullableField.String)
+				if err != nil {
+					return nil, err
+				}
+				return map[string]interface{}{string(typeName): int32(t.Unix())}, nil
+			}
+			return nil, nil
+		case avro.Type(avro.LogicalTypeTime):
+			nullableField := sqlField.(*sql.NullString)
+			if nullableField.Valid {
+				t, err := time.Parse(SQLTimeFormat, nullableField.String)
+				if err != nil {
+					return nil, err
+				}
+				return map[string]interface{}{string(typeName): int32(t.Unix())}, nil
+			}
+			return nil, nil
+		case avro.Type(avro.LogicalTypeTimestamp):
+			switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
+			case string(DateTime):
+				nullableField := sqlField.(*sql.NullString)
+				if nullableField.Valid {
+					t, err := time.Parse(SQLDateTimeFormat, nullableField.String)
+					if err != nil {
+						return nil, err
+					}
+					return map[string]interface{}{string(typeName): int32(t.Unix())}, nil
+				}
+				return nil, nil
+			case "", string(Timestamp):
+				nullableField := sqlField.(*sql.NullInt64)
+				if nullableField.Valid {
+					return map[string]interface{}{string(typeName): int32(nullableField.Int64)}, nil
+				}
+				return nil, nil
+			default:
+				return nil, ErrUnsupportedTypeForSQL
+			}
 		case avro.TypeFloat64:
 			nullableField := sqlField.(*sql.NullFloat64)
 			if nullableField.Valid {
