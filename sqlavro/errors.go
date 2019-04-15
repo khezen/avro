@@ -9,4 +9,6 @@ var (
 	ErrUnsupportedTypeForCriterion = errors.New("ErrUnsupportedTypeForCriterion")
 	// ErrCannotIgnoreOrder -
 	ErrCannotIgnoreOrder = errors.New("ErrCannotIgnoreOrder")
+	// ErrUnsupportedTypeForSQL -
+	ErrUnsupportedTypeForSQL = errors.New("ErrUnsupportedTypeForSQL")
 )
