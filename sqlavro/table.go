@@ -1,6 +1,7 @@
 package sqlavro
 
 import (
+	"bytes"
 	"database/sql"
 	"strings"
 
@@ -9,13 +10,20 @@ import (
 
 // SQLTable2AVRO - transalte the given SQL table to AVRO schema
 func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, error) {
-	rows, err := db.Query(
-		`SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_OCTET_LENGTH
+	qBuf := bytes.NewBufferString(`
+		 SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_OCTET_LENGTH
 		 FROM INFORMATION_SCHEMA.COLUMNS 
-		 WHERE TABLE_SCHEMA=? 
-		 AND TABLE_NAME=?`,
-		dbName,
-		tableName,
+		 WHERE TABLE_NAME=?
+	`)
+	params := make([]interface{}, 0, 2)
+	params = append(params, tableName)
+	if len(dbName) > 0 {
+		qBuf.WriteString(` AND TABLE_SCHEMA=?`)
+		params = append(params, tableName)
+	}
+	rows, err := db.Query(
+		qBuf.String(),
+		params...,
 	)
 	if err != nil {
 		return nil, err

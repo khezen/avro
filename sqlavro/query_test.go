@@ -57,7 +57,7 @@ func TestQuery(t *testing.T) {
 		}
 		mockPostsRows  = sqlmock.NewRows(postsColumns)
 		postRowsValues = [][]driver.Value{
-			[]driver.Value{"7d20e79f-9aba-4259-95db-c747836682c0", "lorem ipsum", []byte("lorem ipsum etc..."), sql.NullString{Valid: false}, "2009-04-10 00:00:00", sql.NullString{Valid: false}, sql.NullString{Valid: true, String: "2.0"}},
+			[]driver.Value{42, "lorem ipsum", []byte("lorem ipsum etc..."), sql.NullString{Valid: false}, "2009-04-10 00:00:00", sql.NullString{Valid: false}, sql.NullString{Valid: true, String: "2.0"}},
 		}
 	)
 	for _, rowValues := range postRowsValues {
