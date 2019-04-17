@@ -64,17 +64,26 @@ func Query2Native(db *sql.DB, schema *avro.RecordSchema, limit int, criteria ...
 }
 
 func renderQuery(schema *avro.RecordSchema, limit int, criteria ...Criterion) (statement string, params []interface{}, err error) {
-	if len(schema.Fields) == 0 {
+	fieldsLen := len(schema.Fields)
+	if fieldsLen == 0 {
 		return "", nil, ErrExpectRecordSchema
 	}
-	params = make([]interface{}, 0, len(schema.Fields)+4*len(criteria)+4)
-	qBuf := bytes.NewBufferString("SELECT")
-	for _, field := range schema.Fields {
-		qBuf.WriteString(" ?")
-		params = append(params, field.Name)
+	params = make([]interface{}, 0, 4*len(criteria)+2)
+	qBuf := bytes.NewBufferString("SELECT ")
+	for i := 0; i < fieldsLen-1; i++ {
+		qBuf.WriteRune('`')
+		qBuf.WriteString(schema.Fields[i].Name)
+		qBuf.WriteString("`,")
 	}
-	qBuf.WriteString(" FROM ?.?")
-	params = append(params, schema.Namespace, schema.Name)
+	qBuf.WriteRune('`')
+	qBuf.WriteString(schema.Fields[fieldsLen-1].Name)
+	qBuf.WriteString("` FROM `")
+	if len(schema.Namespace) > 0 {
+		qBuf.WriteString(schema.Namespace)
+		qBuf.WriteString("`.`")
+	}
+	qBuf.WriteString(schema.Name)
+	qBuf.WriteRune('`')
 	criteriaLen := len(criteria)
 	if criteriaLen == 0 {
 		return qBuf.String(), params, nil

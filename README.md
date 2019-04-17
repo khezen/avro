@@ -136,7 +136,7 @@ func main() {
 			title VARCHAR(128) NOT NULL,
 			body LONGBLOB NOT NULL,
 			content_type VARCHAR(128) DEFAULT 'text/markdown; charset=UTF-8',
-			post_date DATETIME NOT NULL DEFAULT NOW(),
+			post_date DATETIME NOT NULL,
 			update_date DATETIME,
 			reading_time_minutes DECIMAL(3,1),
 			PRIMARY KEY(ID)
