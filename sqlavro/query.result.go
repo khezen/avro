@@ -2,6 +2,8 @@ package sqlavro
 
 import (
 	"database/sql"
+	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/khezen/avro"
@@ -240,10 +242,21 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 				return map[string]interface{}{string(subSchema.TypeName()): nullableField.String}, nil
 			}
 			return nil, nil
-		case avro.TypeBytes, avro.TypeFixed, avro.Type(avro.LogicalTypeDecimal):
+		case avro.TypeBytes, avro.TypeFixed:
 			field := *sqlField.(*[]byte)
 			if field != nil {
 				return map[string]interface{}{string(subSchema.TypeName()): field}, nil
+			}
+			return nil, nil
+		case avro.Type(avro.LogicalTypeDecimal):
+			field := *sqlField.(*[]byte)
+			if field != nil {
+				r := new(big.Rat)
+				_, err := fmt.Sscan(string(field), r)
+				if err != nil {
+					return nil, err
+				}
+				return map[string]interface{}{string("bytes.decimal"): r}, nil
 			}
 			return nil, nil
 		}
