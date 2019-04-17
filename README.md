@@ -177,8 +177,8 @@ func main() {
 //             {
 //                 "name": "content_type",
 //                 "type": [
-//                     "null",
-//                     "string"
+//                     "string",
+//                     "null"
 //                 ],
 //                 "default": "text/markdown; charset=UTF-8"
 //             },

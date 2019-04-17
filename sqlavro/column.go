@@ -3,6 +3,7 @@ package sqlavro
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/khezen/avro"
@@ -111,7 +112,12 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 		break
 	}
 	if isNullable {
-		fieldType = avro.UnionSchema([]avro.Schema{avro.TypeNull, fieldType})
+		if defaultValue == nil || strings.EqualFold("null", strings.ToLower(string(defaultValue))) {
+			fieldType = avro.UnionSchema([]avro.Schema{avro.TypeNull, fieldType})
+		} else {
+			fieldType = avro.UnionSchema([]avro.Schema{fieldType, avro.TypeNull})
+		}
+
 	}
 	return &avro.RecordFieldSchema{
 		Name:    columnName,
