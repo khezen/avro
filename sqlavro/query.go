@@ -67,7 +67,7 @@ func renderQuery(schema *avro.RecordSchema, limit int, criteria ...Criterion) (s
 	if fieldsLen == 0 {
 		return "", nil, ErrExpectRecordSchema
 	}
-	params = make([]interface{}, 0, 4*len(criteria)+2)
+	params = make([]interface{}, 0, len(criteria)+2)
 	qBuf := bytes.NewBufferString("SELECT ")
 	for i := 0; i < fieldsLen-1; i++ {
 		qBuf.WriteRune('`')
@@ -89,34 +89,42 @@ func renderQuery(schema *avro.RecordSchema, limit int, criteria ...Criterion) (s
 	}
 	qBuf.WriteString("WHERE")
 	for i, criterion := range criteria {
-		qBuf.WriteString(" ???")
-		if i < criteriaLen-1 {
-			qBuf.WriteString(" AND")
-		}
 		critLimit, err := criterion.Limit()
 		if err != nil {
 			return "", nil, err
+		}
+		if critLimit == nil {
+			continue
 		}
 		operand, err := criterion.OrderOperand()
 		if err != nil {
 			return "", nil, err
 		}
-		params = append(params, criterion.FieldName, operand, critLimit)
+		qBuf.WriteString(" `")
+		qBuf.WriteString(sqlEscape(criterion.FieldName))
+		qBuf.WriteRune('`')
+		qBuf.WriteString(operand)
+		qBuf.WriteString("?")
+		if i < criteriaLen-1 {
+			qBuf.WriteString(" AND")
+		}
+		params = append(params, critLimit)
 	}
 	qBuf.WriteString(" ORDER BY")
 	for i, criterion := range criteria {
-		qBuf.WriteString(" ?")
+		qBuf.WriteString(" `")
+		qBuf.WriteString(sqlEscape(criterion.FieldName))
+		qBuf.WriteRune('`')
 		if i < criteriaLen-1 {
 			qBuf.WriteString(",")
 		}
-		params = append(params, criterion.FieldName)
 	}
-	qBuf.WriteString(" ?")
 	sort, err := criteria[0].OrderSort()
 	if err != nil {
 		return "", nil, err
 	}
-	params = append(params, sort)
+	qBuf.WriteRune(' ')
+	qBuf.WriteString(sort)
 	qBuf.WriteString(" LIMIT ?")
 	params = append(params, limit)
 	return qBuf.String(), params, nil

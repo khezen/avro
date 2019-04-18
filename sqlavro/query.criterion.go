@@ -12,12 +12,15 @@ import (
 type Criterion struct {
 	FieldName string          `json:"field"`
 	Type      avro.Type       `json:"type"`
-	RawLimit  json.RawMessage `json:"limit"`
+	RawLimit  json.RawMessage `json:"limit,omitempty"`
 	Order     avro.Order      `json:"order,omitempty"` // default: Ascending
 }
 
 // Limit -
 func (c *Criterion) Limit() (interface{}, error) {
+	if c.RawLimit == nil {
+		return nil, nil
+	}
 	switch c.Type {
 	case avro.TypeFloat32, avro.TypeFloat64:
 		return strconv.ParseFloat(string(c.RawLimit), 64)
