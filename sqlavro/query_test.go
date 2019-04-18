@@ -1,12 +1,20 @@
 package sqlavro
 
 import (
+	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/khezen/avro"
+	"github.com/linkedin/goavro"
+	"github.com/valyala/fastjson"
 )
+
+var unmarshaller fastjson.Parser
 
 func TestQuery(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -41,7 +49,7 @@ func TestQuery(t *testing.T) {
 		`SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_OCTET_LENGTH
 		FROM INFORMATION_SCHEMA.COLUMNS (.+)`,
 	).WillReturnRows(mockInfoRows)
-	schemas, err := SQLTable2AVRO(db, "blog", "posts")
+	schema, err := SQLTable2AVRO(db, "blog", "posts")
 	if err != nil {
 		t.Error(err)
 	}
@@ -66,8 +74,77 @@ func TestQuery(t *testing.T) {
 	mock.ExpectQuery(
 		"SELECT (.+) FROM `blog`.`posts`(.*)",
 	).WillReturnRows(mockPostsRows)
-	_, err = Query(db, schemas, 10)
+	avroBytes, err := Query(db, schema, 10)
 	if err != nil {
 		t.Error(err)
 	}
+	resultSchema := avro.ArraySchema{
+		Type:  avro.TypeArray,
+		Items: schema,
+	}
+	resultSchemaBytes, err := json.Marshal(resultSchema)
+	if err != nil {
+		panic(err)
+	}
+	codec, err := goavro.NewCodec(string(resultSchemaBytes))
+	if err != nil {
+		t.Error(err)
+	}
+	// Convert binary Avro data back to native Go form
+	native, _, err := codec.NativeFromBinary(avroBytes)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Convert native Go form to textual Avro data
+	textual, err := codec.TextualFromNative(nil, native)
+	if err != nil {
+		fmt.Println(err)
+	}
+	expetedTextual := `[{"update_date":null,"reading_time_minutes":{"bytes.decimal":"\u0014"},"ID":42,"title":"lorem ipsum","body":"lorem ipsum etc...","content_type":null,"post_date":1239321600}]`
+	if !JSONArraysEquals([]byte(expetedTextual), textual) {
+		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expetedTextual), string(textual))
+	}
+
+}
+
+func JSONArraysEquals(expected, given []byte) bool {
+	var expectedArray []map[string]json.RawMessage
+	err := json.Unmarshal(expected, &expectedArray)
+	if err != nil {
+		panic(err)
+	}
+	var givenArray []map[string]json.RawMessage
+	err = json.Unmarshal(given, &givenArray)
+	if err != nil {
+		panic(err)
+	}
+	if len(givenArray) != len(expectedArray) {
+		return false
+	}
+	for i := range expectedArray {
+		if !JSONObjectEquals(expectedArray[i], givenArray[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func JSONObjectEquals(expectedObject, givenObject map[string]json.RawMessage) bool {
+	for key := range expectedObject {
+		if _, ok := givenObject[key]; !ok {
+			return false
+		}
+		if !bytes.EqualFold(expectedObject[key], givenObject[key]) {
+			return false
+		}
+	}
+	for key := range givenObject {
+		if _, ok := expectedObject[key]; !ok {
+			return false
+		}
+		if !bytes.EqualFold(expectedObject[key], givenObject[key]) {
+			return false
+		}
+	}
+	return true
 }

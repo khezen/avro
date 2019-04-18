@@ -11,7 +11,7 @@ import (
 
 // Query -
 func Query(db *sql.DB, schema *avro.RecordSchema, limit int, criteria ...Criterion) (avroBytes []byte, err error) {
-	native, err := Query2Native(db, schema, limit, criteria...)
+	native, err := query2Native(db, schema, limit, criteria...)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,7 @@ func Query(db *sql.DB, schema *avro.RecordSchema, limit int, criteria ...Criteri
 	return avroBytes, nil
 }
 
-// Query2Native -
-func Query2Native(db *sql.DB, schema *avro.RecordSchema, limit int, criteria ...Criterion) ([]map[string]interface{}, error) {
+func query2Native(db *sql.DB, schema *avro.RecordSchema, limit int, criteria ...Criterion) ([]map[string]interface{}, error) {
 	statement, params, err := renderQuery(schema, limit, criteria...)
 	if err != nil {
 		return nil, err
