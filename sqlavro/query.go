@@ -71,17 +71,17 @@ func renderQuery(schema *avro.RecordSchema, limit int, criteria ...Criterion) (s
 	qBuf := bytes.NewBufferString("SELECT ")
 	for i := 0; i < fieldsLen-1; i++ {
 		qBuf.WriteRune('`')
-		qBuf.WriteString(schema.Fields[i].Name)
+		qBuf.WriteString(sqlEscape(schema.Fields[i].Name))
 		qBuf.WriteString("`,")
 	}
 	qBuf.WriteRune('`')
-	qBuf.WriteString(schema.Fields[fieldsLen-1].Name)
+	qBuf.WriteString(sqlEscape(schema.Fields[fieldsLen-1].Name))
 	qBuf.WriteString("` FROM `")
 	if len(schema.Namespace) > 0 {
-		qBuf.WriteString(schema.Namespace)
+		qBuf.WriteString(sqlEscape(schema.Namespace))
 		qBuf.WriteString("`.`")
 	}
-	qBuf.WriteString(schema.Name)
+	qBuf.WriteString(sqlEscape(schema.Name))
 	qBuf.WriteRune('`')
 	criteriaLen := len(criteria)
 	if criteriaLen == 0 {
