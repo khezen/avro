@@ -11,7 +11,7 @@ import (
 // SQLTable2AVRO - transalte the given SQL table to AVRO schema
 func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, error) {
 	qBuf := bytes.NewBufferString(`
-		 SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_OCTET_LENGTH
+		 SELECT TABLE_SCHEMA,COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_OCTET_LENGTH
 		 FROM INFORMATION_SCHEMA.COLUMNS 
 		 WHERE TABLE_NAME=?
 	`)
@@ -31,6 +31,7 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 	defer rows.Close()
 	var (
 		fields            = make([]avro.RecordFieldSchema, 0, 100)
+		tableSchema       string
 		columnName        string
 		dataType          string
 		isNullableStr     string
@@ -42,7 +43,7 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 		charBytesLen      sql.NullInt64
 	)
 	for rows.Next() {
-		err = rows.Scan(&columnName, &dataType, &isNullableStr, &defaultValue, &numPrecision, &numScale, &charBytesLen)
+		err = rows.Scan(&tableSchema, &columnName, &dataType, &isNullableStr, &defaultValue, &numPrecision, &numScale, &charBytesLen)
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +63,7 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 	}
 	return &avro.RecordSchema{
 		Type:      avro.TypeRecord,
-		Namespace: dbName,
+		Namespace: tableSchema,
 		Name:      tableName,
 		Fields:    fields,
 	}, nil
