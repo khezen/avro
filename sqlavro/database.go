@@ -29,12 +29,23 @@ func SQLDatabase2AVRO(db *sql.DB, dbName string) ([]avro.RecordSchema, error) {
 
 // GetTables - returns table names of the given database
 func GetTables(db *sql.DB, dbName string) ([]string, error) {
-	rows, err := db.Query(
-		`SELECT TABLE_NAME 
-		 FROM INFORMATION_SCHEMA.TABLES 
-		 WHERE TABLE_SCHEMA=?`,
-		dbName,
+	var (
+		rows *sql.Rows
+		err  error
 	)
+	if len(dbName) > 0 {
+		rows, err = db.Query(
+			`SELECT TABLE_NAME 
+			 FROM INFORMATION_SCHEMA.TABLES 
+			 WHERE TABLE_SCHEMA=?`,
+			dbName,
+		)
+	} else {
+		rows, err = db.Query(
+			`SELECT TABLE_NAME 
+			 FROM INFORMATION_SCHEMA.TABLES`,
+		)
+	}
 	if err != nil {
 		return nil, err
 	}
