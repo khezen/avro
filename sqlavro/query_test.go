@@ -75,7 +75,11 @@ func TestQuery(t *testing.T) {
 	mock.ExpectQuery(
 		"SELECT (.+) FROM `blog`.`posts`(.*)",
 	).WillReturnRows(mockPostsRows)
-	avroBytes, err := Query(db, schema, 10)
+	avroBytes, err := Query(db, schema, 10, Criterion{
+		FieldName: "post_date",
+		Type:      avro.Type(avro.LogicalTypeTimestamp),
+		RawLimit:  []byte("1970-01-01T00:00:00Z"),
+	})
 	if err != nil {
 		t.Error(err)
 	}
