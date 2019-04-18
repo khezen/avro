@@ -25,7 +25,7 @@ func (c *Criterion) Limit() (interface{}, error) {
 	case avro.TypeFloat32, avro.TypeFloat64:
 		return strconv.ParseFloat(string(c.RawLimit), 64)
 	case avro.TypeInt32, avro.TypeInt64:
-		return strconv.Atoi(string(c.RawLimit))
+		return strconv.ParseInt(string(c.RawLimit), 10, 64)
 	case avro.TypeString:
 		return string(c.RawLimit), nil
 	case avro.Type(avro.LogicalTypeTimestamp):
@@ -64,63 +64,85 @@ func (c *Criterion) OrderSort() (string, error) {
 }
 
 // NewCriterionFloat64 -
-func NewCriterionFloat64(fieldName string, limit float64, order avro.Order) *Criterion {
-	limitStr := strconv.FormatFloat(limit, 'f', -1, 32)
+func NewCriterionFloat64(fieldName string, limit *float64, order avro.Order) *Criterion {
+	var limitBytes []byte
+	if limit != nil {
+		limitBytes = []byte(strconv.FormatFloat(*limit, 'f', -1, 32))
+	}
 	return &Criterion{
 		FieldName: fieldName,
 		Type:      avro.TypeFloat64,
-		RawLimit:  []byte(limitStr),
+		RawLimit:  limitBytes,
 		Order:     order,
 	}
 }
 
 // NewCriterionInt64 -
-func NewCriterionInt64(fieldName string, limit int64, order avro.Order) *Criterion {
-	limitStr := strconv.FormatInt(limit, 10)
+func NewCriterionInt64(fieldName string, limit *int64, order avro.Order) *Criterion {
+	var limitBytes []byte
+	if limit != nil {
+		limitBytes = []byte(strconv.FormatInt(*limit, 10))
+	}
 	return &Criterion{
 		FieldName: fieldName,
 		Type:      avro.TypeInt64,
-		RawLimit:  []byte(limitStr),
+		RawLimit:  limitBytes,
 		Order:     order,
 	}
 }
 
 // NewCriterionString -
-func NewCriterionString(fieldName string, limit string, order avro.Order) *Criterion {
+func NewCriterionString(fieldName string, limit *string, order avro.Order) *Criterion {
+	var limitBytes []byte
+	if limit != nil {
+		limitBytes = []byte(*limit)
+	}
 	return &Criterion{
 		FieldName: fieldName,
 		Type:      avro.TypeString,
-		RawLimit:  []byte(limit),
+		RawLimit:  limitBytes,
 		Order:     order,
 	}
 }
 
 // NewCriterionDateTime -
-func NewCriterionDateTime(fieldName string, limit time.Time, order avro.Order) *Criterion {
+func NewCriterionDateTime(fieldName string, limit *time.Time, order avro.Order) *Criterion {
+	var limitBytes []byte
+	if limit != nil {
+		limitBytes = []byte(limit.Format(time.RFC3339Nano))
+	}
 	return &Criterion{
 		FieldName: fieldName,
 		Type:      avro.Type(avro.LogicalTypeTimestamp),
-		RawLimit:  []byte(limit.Format(time.RFC3339Nano)),
+		RawLimit:  limitBytes,
 		Order:     order,
 	}
 }
 
 // NewCriterionDate -
-func NewCriterionDate(fieldName string, limit time.Time, order avro.Order) *Criterion {
+func NewCriterionDate(fieldName string, limit *time.Time, order avro.Order) *Criterion {
+	var limitBytes []byte
+	if limit != nil {
+		limitBytes = []byte(limit.Format(SQLDateFormat))
+	}
 	return &Criterion{
 		FieldName: fieldName,
 		Type:      avro.Type(avro.LogicalTypeDate),
-		RawLimit:  []byte(limit.Format(SQLDateFormat)),
+		RawLimit:  limitBytes,
 		Order:     order,
 	}
 }
 
 // NewCriterionTime -
-func NewCriterionTime(fieldName string, limit time.Time, order avro.Order) *Criterion {
+func NewCriterionTime(fieldName string, limit *time.Time, order avro.Order) *Criterion {
+	var limitBytes []byte
+	if limit != nil {
+		limitBytes = []byte(limit.Format(SQLTimeFormat))
+	}
 	return &Criterion{
 		FieldName: fieldName,
 		Type:      avro.Type(avro.LogicalTypeTime),
-		RawLimit:  []byte(limit.Format(SQLTimeFormat)),
+		RawLimit:  limitBytes,
 		Order:     order,
 	}
 }
