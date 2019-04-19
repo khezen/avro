@@ -45,6 +45,7 @@ func TestQuery(t *testing.T) {
 			[]driver.Value{"blog", "title", "VARCHAR", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 384}},
 			[]driver.Value{"blog", "body", "LONGBLOB", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 4294967295}},
 			[]driver.Value{"blog", "content_type", "VARCHAR", "YES", sql.NullString{Valid: true, String: "text/markdown; charset=UTF-8"}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 384}},
+			[]driver.Value{"blog", "author", "VARCHAR", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 384}},
 			[]driver.Value{"blog", "post_datetime", "DATETIME", "NO", sql.NullString{Valid: true, String: "CURRENT_TIMESTAMP"}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "update_datetime", "DATETIME", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "reading_time_minutes", "DECIMAL", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 3}, sql.NullInt64{Valid: true, Int64: 1}, sql.NullInt64{Valid: false}},
@@ -55,7 +56,6 @@ func TestQuery(t *testing.T) {
 			[]driver.Value{"blog", "some_int64", "BIGINT", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "some_float64", "DOUBLE", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "some_float32", "FLOAT", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
-
 			[]driver.Value{"blog", "update_date", "DATE", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "update_time", "TIME", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "update_timestamp", "TIMESTAMP", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
@@ -90,6 +90,7 @@ func TestQuery(t *testing.T) {
 			"title",
 			"body",
 			"content_type",
+			"author",
 			"post_datetime",
 			"update_datetime",
 			"reading_time_minute",
@@ -100,7 +101,6 @@ func TestQuery(t *testing.T) {
 			"some_int64",
 			"some_float64",
 			"some_float32",
-
 			"update_date",
 			"update_time",
 			"update_timestamp",
@@ -117,6 +117,7 @@ func TestQuery(t *testing.T) {
 				"lorem ipsum",
 				[]byte("lorem ipsum etc..."),
 				sql.NullString{Valid: false},
+				sql.NullString{Valid: true, String: "John Doe"},
 				"2009-04-10 00:00:00",
 				sql.NullString{Valid: true, String: "2009-04-10 00:00:00"},
 				sql.NullString{Valid: true, String: "2.0"},
@@ -175,7 +176,7 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	expetedTextual := `[{"title":"lorem ipsum","some_nullable_int32":{"int":42},"post_datetime":1239321600,"content_type":null,"reading_time_minutes":{"bytes.decimal":"\u0014"},"body":"lorem ipsum etc...","some_float32":42.42,"some_int64":4242,"update_timestamp":{"int":1254614400},"some_nullable_float64":{"double":4242.4242},"update_time":{"int":2764800},"some_nullable_blob":{"bytes":"lorem ipsum dolor etc..."},"update_datetime":{"int":1239321600},"daily_average_traffic":"u4","post_time":2764800,"some_nullable_int64":{"long":4242},"post_date":14344,"some_float64":4242.4242,"update_date":{"int.date":14344},"some_nullable_float32":{"float":42.42},"ID":42,"post_timestamp":1254614400}]`
+	expetedTextual := `[{"post_datetime":1239321600,"update_timestamp":{"int":1254614400},"title":"lorem ipsum","update_time":{"int":2764800},"post_timestamp":1254614400,"update_date":{"int.date":14344},"some_nullable_float32":{"float":42.42},"some_nullable_float64":{"double":4242.4242},"post_date":14344,"author":{"string":"John Doe"},"body":"lorem ipsum etc...","reading_time_minutes":{"bytes.decimal":"\u0014"},"some_float64":4242.4242,"ID":42,"some_int64":4242,"some_nullable_int64":{"long":4242},"content_type":null,"some_nullable_int32":{"int":42},"daily_average_traffic":"u4","some_float32":42.42,"some_nullable_blob":{"bytes":"lorem ipsum dolor etc..."},"update_datetime":{"int":1239321600},"post_time":2764800}]`
 	if !JSONArraysEquals([]byte(expetedTextual), textual) {
 		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expetedTextual), string(textual))
 	}
