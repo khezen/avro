@@ -49,11 +49,12 @@ func ExampleQuery() {
 		panic(err)
 	}
 	limit := 1000
+	order := avro.Ascending
 	from, err := time.Parse("2006-02-01 15:04:03", "2009-04-10 00:00:00")
 	if err != nil {
 		panic(err)
 	}
-	avroBytes, err := sqlavro.Query(db, schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, avro.Ascending))
+	avroBytes, err := sqlavro.Query(db, schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, order))
 	if err != nil {
 		panic(err)
 	}
