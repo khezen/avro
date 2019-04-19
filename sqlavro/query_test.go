@@ -22,6 +22,13 @@ func TestQuery(t *testing.T) {
 		panic(err)
 	}
 	var (
+		tableColumns = []string{
+			"TABLE_NAME",
+		}
+		mockedTableRows = sqlmock.NewRows(tableColumns)
+		tableRowsValues = [][]driver.Value{
+			[]driver.Value{"posts"},
+		}
 		infoColumns = []string{
 			"TABLE_SCHEMA",
 			"COLUMN_NAME",
@@ -43,14 +50,21 @@ func TestQuery(t *testing.T) {
 			[]driver.Value{"blog", "reading_time_minutes", "DECIMAL", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 3}, sql.NullInt64{Valid: true, Int64: 1}, sql.NullInt64{Valid: false}},
 		}
 	)
+	for _, rowValues := range tableRowsValues {
+		mockedTableRows.AddRow(rowValues...)
+	}
 	for _, rowValues := range infoRowsValues {
 		mockInfoRows.AddRow(rowValues...)
 	}
 	mock.ExpectQuery(
+		`SELECT TABLE_NAME 
+		 FROM INFORMATION_SCHEMA.TABLES(.*)`,
+	).WillReturnRows(mockedTableRows)
+	mock.ExpectQuery(
 		`SELECT TABLE_SCHEMA,COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_OCTET_LENGTH
 		FROM INFORMATION_SCHEMA.COLUMNS (.+)`,
 	).WillReturnRows(mockInfoRows)
-	schema, err := SQLTable2AVRO(db, "blog", "posts")
+	schemas, err := SQLDatabase2AVRO(db, "blog")
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,7 +89,7 @@ func TestQuery(t *testing.T) {
 	mock.ExpectQuery(
 		"SELECT (.+) FROM `blog`.`posts`(.*)",
 	).WillReturnRows(mockPostsRows)
-	avroBytes, err := Query(db, schema, 10, Criterion{
+	avroBytes, err := Query(db, &schemas[0], 10, Criterion{
 		FieldName: "post_date",
 		Type:      avro.Type(avro.LogicalTypeTimestamp),
 		RawLimit:  []byte("1970-01-01T00:00:00Z"),
@@ -85,7 +99,7 @@ func TestQuery(t *testing.T) {
 	}
 	resultSchema := avro.ArraySchema{
 		Type:  avro.TypeArray,
-		Items: schema,
+		Items: &schemas[0],
 	}
 	resultSchemaBytes, err := json.Marshal(resultSchema)
 	if err != nil {
