@@ -76,21 +76,19 @@ func TestCriterion(t *testing.T) {
 		if err != c.expectedOrderErr {
 			t.Errorf("expected %v, got %v", c.expectedOrderErr, err)
 		}
-		if err != nil {
-			continue
-		}
-		if !strings.EqualFold(c.expectedOperand, operand) {
-			t.Errorf("expected %v, got %v", c.expectedOperand, operand)
+		if err == nil {
+			if !strings.EqualFold(c.expectedOperand, operand) {
+				t.Errorf("expected %v, got %v", c.expectedOperand, operand)
+			}
 		}
 		sort, err := criterion.OrderSort()
 		if err != c.expectedOrderErr {
 			t.Errorf("expected %v, got %v", c.expectedOrderErr, err)
 		}
-		if err != nil {
-			continue
-		}
-		if !strings.EqualFold(c.expectedSort, sort) {
-			t.Errorf("expected %v, got %v", c.expectedSort, sort)
+		if err == nil {
+			if !strings.EqualFold(c.expectedSort, sort) {
+				t.Errorf("expected %v, got %v", c.expectedSort, sort)
+			}
 		}
 	}
 }
