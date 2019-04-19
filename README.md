@@ -5,7 +5,7 @@
 
 The purpose of this package is to facilitate use of AVRO with `go` strong typing.
 
-## Features:
+## Features
 
 ### `github.com/khezen/avro`
 
@@ -42,6 +42,8 @@ When AVRO data is stored in a file, its schema is stored with it, so that files 
 ### Schema Marshal/Unmarshal
 
 ```golang
+package main
+
 import (
   "encoding/json"
   "fmt"
@@ -116,44 +118,45 @@ func main() {
 ### Convert SQL Table to AVRO Schema
 
 ```golang
+package main
 import (
-	"database/sql"
-	"encoding/json"
-	"fmt"
+  "database/sql"
+  "encoding/json"
+  "fmt"
 
-	"github.com/khezen/avro/sqlavro"
+  "github.com/khezen/avro/sqlavro"
 )
 
 func main() {
-	db, err := sql.Open("mysql", "root@/blog")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	_, err = db.Exec(
-		`CREATE TABLE posts(
-			ID INT NOT NULL,
-			title VARCHAR(128) NOT NULL,
-			body LONGBLOB NOT NULL,
-			content_type VARCHAR(128) DEFAULT 'text/markdown; charset=UTF-8',
-			post_date DATETIME NOT NULL,
-			update_date DATETIME,
-			reading_time_minutes DECIMAL(3,1),
-			PRIMARY KEY(ID)
-		)`,
-	)
-	if err != nil {
-		panic(err)
-	}
-	schemas, err := sqlavro.SQLDatabase2AVRO(db, "blog")
-	if err != nil {
-		panic(err)
-	}
-	schemasBytes, err := json.Marshal(schemas)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(schemasBytes))
+  db, err := sql.Open("mysql", "root@/blog")
+  if err != nil {
+    panic(err)
+  }
+  defer db.Close()
+  _, err = db.Exec(
+    `CREATE TABLE posts(
+      ID INT NOT NULL,
+      title VARCHAR(128) NOT NULL,
+      body LONGBLOB NOT NULL,
+      content_type VARCHAR(128) DEFAULT 'text/markdown; charset=UTF-8',
+      post_date DATETIME NOT NULL,
+      update_date DATETIME,
+      reading_time_minutes DECIMAL(3,1),
+      PRIMARY KEY(ID)
+    )`,
+  )
+  if err != nil {
+    panic(err)
+  }
+  schemas, err := sqlavro.SQLDatabase2AVRO(db, "blog")
+  if err != nil {
+    panic(err)
+  }
+  schemasBytes, err := json.Marshal(schemas)
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println(string(schemasBytes))
 }
 
 // [
@@ -216,6 +219,76 @@ func main() {
 //         ]
 //     }
 // ]
+```
+
+### Query records from SQL into AVRO bytes
+
+```golang
+package main
+
+import (
+  "database/sql"
+  "io/ioutil"
+  "time"
+
+  "github.com/khezen/avro"
+
+  "github.com/khezen/avro/sqlavro"
+)
+
+func main() {
+  db, err := sql.Open("mysql", "root@/blog")
+  if err != nil {
+    panic(err)
+  }
+  defer db.Close()
+  _, err = db.Exec(
+    `CREATE TABLE posts(
+      ID INT NOT NULL,
+      title VARCHAR(128) NOT NULL,
+      body LONGBLOB NOT NULL,
+      content_type VARCHAR(128) DEFAULT 'text/markdown; charset=UTF-8',
+      post_date DATETIME NOT NULL,
+      update_date DATETIME,
+      reading_time_minutes DECIMAL(3,1),
+      PRIMARY KEY(ID)
+    )`,
+  )
+  if err != nil {
+    panic(err)
+  }
+  _, err = db.Exec(
+    // statement
+    `INSERT INTO posts(ID,title,body,content_type,post_date,update_date,reading_time_minutes)
+     VALUES (?,?,?,?,?,?,?)`,
+    // values
+    42,
+    "lorem ispum",
+    []byte(`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`),
+    "text/markdown; charset=UTF-8",
+    "2009-04-10 00:00:00",
+    "2009-04-10 00:00:00",
+    "4.2",
+  )
+  schema, err := sqlavro.SQLTable2AVRO(db, "blog", "posts")
+  if err != nil {
+    panic(err)
+  }
+  limit := 1000
+  from, err := time.Parse("2006-02-01 15:04:03", "2009-04-10 00:00:00")
+  if err != nil {
+    panic(err)
+  }
+  avroBytes, err := sqlavro.Query(db, schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, avro.Ascending))
+  if err != nil {
+    panic(err)
+  }
+  err = ioutil.WriteFile("/tmp/blog_posts.avro", avroBytes, 0644)
+  if err != nil {
+    panic(err)
+  }
+}
+
 ```
 
 ## Issues

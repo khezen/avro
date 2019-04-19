@@ -8,7 +8,7 @@ import (
 	"github.com/khezen/avro/sqlavro"
 )
 
-func exampleSQLDatabase2Avro() {
+func ExampleSQLDatabase2AVRO() {
 	db, err := sql.Open("mysql", "root@/blog")
 	if err != nil {
 		panic(err)
