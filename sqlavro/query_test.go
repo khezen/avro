@@ -49,13 +49,21 @@ func TestQuery(t *testing.T) {
 			[]driver.Value{"blog", "update_datetime", "DATETIME", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "reading_time_minutes", "DECIMAL", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 3}, sql.NullInt64{Valid: true, Int64: 1}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "daily_average_traffic", "DECIMAL", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 14}, sql.NullInt64{Valid: true, Int64: 2}, sql.NullInt64{Valid: false}},
-
 			[]driver.Value{"blog", "post_date", "DATE", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "post_time", "TIME", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "post_timestamp", "TIMESTAMP", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "some_int64", "BIGINT", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "some_float64", "DOUBLE", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "some_float32", "FLOAT", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+
+			[]driver.Value{"blog", "update_date", "DATE", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "update_time", "TIME", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "update_timestamp", "TIMESTAMP", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_nullable_int32", "INT", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_nullable_int64", "BIGINT", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_nullable_float64", "DOUBLE", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_nullable_float32", "FLOAT", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_nullable_blob", "BLOB", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 		}
 	)
 	for _, rowValues := range tableRowsValues {
@@ -92,6 +100,15 @@ func TestQuery(t *testing.T) {
 			"some_int64",
 			"some_float64",
 			"some_float32",
+
+			"update_date",
+			"update_time",
+			"update_timestamp",
+			"some_nullable_int32",
+			"some_nullable_int64",
+			"some_nullable_float64",
+			"some_nullable_float32",
+			"some_nullable_blob",
 		}
 		mockPostsRows  = sqlmock.NewRows(postsColumns)
 		postRowsValues = [][]driver.Value{
@@ -110,6 +127,15 @@ func TestQuery(t *testing.T) {
 				4242,
 				4242.4242,
 				42.42,
+
+				sql.NullString{Valid: true, String: "2009-04-10"},
+				sql.NullString{Valid: true, String: "00:00:00"},
+				sql.NullInt64{Valid: true, Int64: 1254614400},
+				sql.NullInt64{Valid: true, Int64: 42},
+				sql.NullInt64{Valid: true, Int64: 4242},
+				sql.NullFloat64{Valid: true, Float64: 4242.4242},
+				sql.NullFloat64{Valid: true, Float64: 42.42},
+				[]byte("lorem ipsum dolor etc..."),
 			},
 		}
 	)
@@ -149,7 +175,7 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	expetedTextual := `[{"reading_time_minutes":{"bytes.decimal":"\u0014"},"update_datetime":{"int":1239321600},"ID":42,"post_time":2764800,"post_date":14344,"daily_average_traffic":"u4","some_float32":42.42,"post_datetime":1239321600,"post_timestamp":1254614400,"content_type":null,"some_float64":4242.4242,"title":"lorem ipsum","body":"lorem ipsum etc...","some_int64":4242}]`
+	expetedTextual := `[{"title":"lorem ipsum","some_nullable_int32":{"int":42},"post_datetime":1239321600,"content_type":null,"reading_time_minutes":{"bytes.decimal":"\u0014"},"body":"lorem ipsum etc...","some_float32":42.42,"some_int64":4242,"update_timestamp":{"int":1254614400},"some_nullable_float64":{"double":4242.4242},"update_time":{"int":2764800},"some_nullable_blob":{"bytes":"lorem ipsum dolor etc..."},"update_datetime":{"int":1239321600},"daily_average_traffic":"u4","post_time":2764800,"some_nullable_int64":{"long":4242},"post_date":14344,"some_float64":4242.4242,"update_date":{"int.date":14344},"some_nullable_float32":{"float":42.42},"ID":42,"post_timestamp":1254614400}]`
 	if !JSONArraysEquals([]byte(expetedTextual), textual) {
 		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expetedTextual), string(textual))
 	}

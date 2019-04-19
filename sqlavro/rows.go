@@ -199,7 +199,7 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 				if err != nil {
 					return nil, err
 				}
-				return map[string]interface{}{string(subSchema.TypeName()): int32(t.Unix())}, nil
+				return map[string]interface{}{"int.date": t}, nil
 			}
 			return nil, nil
 		case avro.Type(avro.LogicalTypeTime):
@@ -209,7 +209,8 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 				if err != nil {
 					return nil, err
 				}
-				return map[string]interface{}{string(subSchema.TypeName()): int32(t.Unix())}, nil
+				t = t.AddDate(1970, 1, 1)
+				return map[string]interface{}{"int": int32(t.Unix())}, nil
 			}
 			return nil, nil
 		case avro.Type(avro.LogicalTypeTimestamp):
@@ -227,7 +228,7 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 			case "", string(Timestamp):
 				nullableField := sqlField.(*sql.NullInt64)
 				if nullableField.Valid {
-					return map[string]interface{}{string(subSchema.TypeName()): int32(nullableField.Int64)}, nil
+					return map[string]interface{}{"int": int32(nullableField.Int64)}, nil
 				}
 				return nil, nil
 			default:
