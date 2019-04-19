@@ -34,6 +34,19 @@ func (c *Criterion) Limit() (interface{}, error) {
 			return nil, err
 		}
 		return t.Format(SQLDateTimeFormat), nil
+	case avro.Type(avro.LogicalTypeDate):
+		_, err := time.Parse(SQLDateFormat, string(c.RawLimit))
+		if err != nil {
+			return nil, err
+		}
+		return string(c.RawLimit), nil
+	case avro.Type(avro.LogicalTypeTime):
+		_, err := time.Parse(SQLTimeFormat, string(c.RawLimit))
+		if err != nil {
+			return nil, err
+		}
+		return string(c.RawLimit), nil
+
 	default:
 		return nil, ErrUnsupportedTypeForCriterion
 	}
