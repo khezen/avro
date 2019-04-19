@@ -92,28 +92,31 @@ func main() {
   }
   fmt.Println(string(schemaBytes))
 }
-// {
-//     "type": "record",
-//     "namespace": "test",
-//     "name": "LongList",
-//     "aliases": [
-//         "LinkedLongs"
-//     ],
-//     "doc": "linked list of 64 bits integers",
-//     "fields": [
-//         {
-//             "name": "value",
-//             "type": "long"
-//         },
-//         {
-//             "name": "next",
-//             "type": [
-//                 "null",
-//                 "LongList"
-//             ]
-//         }
-//     ]
-// }
+```
+
+```json
+{
+    "type": "record",
+    "namespace": "test",
+    "name": "LongList",
+    "aliases": [
+        "LinkedLongs"
+    ],
+    "doc": "linked list of 64 bits integers",
+    "fields": [
+        {
+            "name": "value",
+            "type": "long"
+        },
+        {
+            "name": "next",
+            "type": [
+                "null",
+                "LongList"
+            ]
+        }
+    ]
+}
 ```
 
 ### Convert SQL Table to AVRO Schema
@@ -159,67 +162,69 @@ func main() {
   }
   fmt.Println(string(schemasBytes))
 }
+```
 
-// [
-//     {
-//         "type": "record",
-//         "namespace": "blog",
-//         "name": "posts",
-//         "fields": [
-//             {
-//                 "name": "ID",
-//                 "type": "int"
-//             },
-//             {
-//                 "name": "title",
-//                 "type": "string"
-//             },
-//             {
-//                 "name": "body",
-//                 "type": "bytes"
-//             },
-//             {
-//                 "name": "content_type",
-//                 "type": [
-//                     "string",
-//                     "null"
-//                 ],
-//                 "default": "text/markdown; charset=UTF-8"
-//             },
-//             {
-//                 "name": "post_date",
-//                 "type": {
-//                     "type": "int",
-//                     "doc":"datetime",
-//                     "logicalType": "timestamp"
-//                 }
-//             },
-//             {
-//                 "name": "update_date",
-//                 "type": [
-//                     "null",
-//                     {
-//                         "type": "int",
-//                         "doc":"datetime",
-//                         "logicalType": "timestamp"
-//                     }
-//                 ]
-//             },
-//             {
-//                 "name": "reading_time_minutes",
-//                 "type": [
-//                     "null",
-//                     {
-//                         "type": "bytes",
-//                         "logicalType": "decimal",
-//                         "precision": 3,
-//                         "scale": 1
-//                     }
-//                 ]
-//             }
-//         ]
-//     }
-// ]
+```json
+[
+    {
+        "type": "record",
+        "namespace": "blog",
+        "name": "posts",
+        "fields": [
+            {
+                "name": "ID",
+                "type": "int"
+            },
+            {
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "name": "body",
+                "type": "bytes"
+            },
+            {
+                "name": "content_type",
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "default": "text/markdown; charset=UTF-8"
+            },
+            {
+                "name": "post_date",
+                "type": {
+                    "type": "int",
+                    "doc":"datetime",
+                    "logicalType": "timestamp"
+                }
+            },
+            {
+                "name": "update_date",
+                "type": [
+                    "null",
+                    {
+                        "type": "int",
+                        "doc":"datetime",
+                        "logicalType": "timestamp"
+                    }
+                ]
+            },
+            {
+                "name": "reading_time_minutes",
+                "type": [
+                    "null",
+                    {
+                        "type": "bytes",
+                        "logicalType": "decimal",
+                        "precision": 3,
+                        "scale": 1
+                    }
+                ]
+            }
+        ]
+    }
+]
 ```
 
 ### Query records from SQL into AVRO bytes
