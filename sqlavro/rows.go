@@ -123,13 +123,14 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 		if err != nil {
 			return nil, err
 		}
-		return int32(t.Unix()), nil
+		return t, nil
 	case avro.Type(avro.LogicalTypeTime):
 		timeStr := *sqlField.(*string)
 		t, err := time.Parse(SQLTimeFormat, timeStr)
 		if err != nil {
 			return nil, err
 		}
+		t = t.AddDate(1970, 1, 1)
 		return int32(t.Unix()), nil
 	case avro.Type(avro.LogicalTypeTimestamp):
 		switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
@@ -151,8 +152,16 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 		return *sqlField.(*float32), nil
 	case avro.TypeString:
 		return *sqlField.(*string), nil
-	case avro.TypeBytes, avro.TypeFixed, avro.Type(avro.LogicalTypeDecimal):
+	case avro.TypeBytes, avro.TypeFixed:
 		return *sqlField.(*[]byte), nil
+	case avro.Type(avro.LogicalTypeDecimal):
+		field := *sqlField.(*[]byte)
+		r := new(big.Rat)
+		_, err := fmt.Sscan(string(field), r)
+		if err != nil {
+			return nil, err
+		}
+		return r, nil
 	case avro.TypeUnion:
 		types := schema.(avro.UnionSchema)
 		isNullable := false
@@ -212,7 +221,7 @@ func renderNativeField(schema avro.Schema, sqlField interface{}) (interface{}, e
 					if err != nil {
 						return nil, err
 					}
-					return map[string]interface{}{string(subSchema.TypeName()): int32(t.Unix())}, nil
+					return map[string]interface{}{"int": int32(t.Unix())}, nil
 				}
 				return nil, nil
 			case "", string(Timestamp):

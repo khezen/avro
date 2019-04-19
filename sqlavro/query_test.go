@@ -45,9 +45,17 @@ func TestQuery(t *testing.T) {
 			[]driver.Value{"blog", "title", "VARCHAR", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 384}},
 			[]driver.Value{"blog", "body", "LONGBLOB", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 4294967295}},
 			[]driver.Value{"blog", "content_type", "VARCHAR", "YES", sql.NullString{Valid: true, String: "text/markdown; charset=UTF-8"}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: true, Int64: 384}},
-			[]driver.Value{"blog", "post_date", "DATETIME", "NO", sql.NullString{Valid: true, String: "CURRENT_TIMESTAMP"}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
-			[]driver.Value{"blog", "update_date", "DATETIME", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "post_datetime", "DATETIME", "NO", sql.NullString{Valid: true, String: "CURRENT_TIMESTAMP"}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "update_datetime", "DATETIME", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 			[]driver.Value{"blog", "reading_time_minutes", "DECIMAL", "YES", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 3}, sql.NullInt64{Valid: true, Int64: 1}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "daily_average_traffic", "DECIMAL", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: true, Int64: 14}, sql.NullInt64{Valid: true, Int64: 2}, sql.NullInt64{Valid: false}},
+
+			[]driver.Value{"blog", "post_date", "DATE", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "post_time", "TIME", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "post_timestamp", "TIMESTAMP", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_int64", "BIGINT", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_float64", "DOUBLE", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
+			[]driver.Value{"blog", "some_float32", "FLOAT", "NO", sql.NullString{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}, sql.NullInt64{Valid: false}},
 		}
 	)
 	for _, rowValues := range tableRowsValues {
@@ -74,13 +82,35 @@ func TestQuery(t *testing.T) {
 			"title",
 			"body",
 			"content_type",
-			"post_date",
-			"update_date",
+			"post_datetime",
+			"update_datetime",
 			"reading_time_minute",
+			"daily_average_traffic",
+			"post_date",
+			"post_time",
+			"post_timestamp",
+			"some_int64",
+			"some_float64",
+			"some_float32",
 		}
 		mockPostsRows  = sqlmock.NewRows(postsColumns)
 		postRowsValues = [][]driver.Value{
-			[]driver.Value{42, "lorem ipsum", []byte("lorem ipsum etc..."), sql.NullString{Valid: false}, "2009-04-10 00:00:00", sql.NullString{Valid: false}, sql.NullString{Valid: true, String: "2.0"}},
+			[]driver.Value{
+				42,
+				"lorem ipsum",
+				[]byte("lorem ipsum etc..."),
+				sql.NullString{Valid: false},
+				"2009-04-10 00:00:00",
+				sql.NullString{Valid: true, String: "2009-04-10 00:00:00"},
+				sql.NullString{Valid: true, String: "2.0"},
+				"3000.46",
+				"2009-04-10",
+				"00:00:00",
+				1254614400,
+				4242,
+				4242.4242,
+				42.42,
+			},
 		}
 	)
 	for _, rowValues := range postRowsValues {
@@ -119,7 +149,7 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	expetedTextual := `[{"update_date":null,"reading_time_minutes":{"bytes.decimal":"\u0014"},"ID":42,"title":"lorem ipsum","body":"lorem ipsum etc...","content_type":null,"post_date":1239321600}]`
+	expetedTextual := `[{"reading_time_minutes":{"bytes.decimal":"\u0014"},"update_datetime":{"int":1239321600},"ID":42,"post_time":2764800,"post_date":14344,"daily_average_traffic":"u4","some_float32":42.42,"post_datetime":1239321600,"post_timestamp":1254614400,"content_type":null,"some_float64":4242.4242,"title":"lorem ipsum","body":"lorem ipsum etc...","some_int64":4242}]`
 	if !JSONArraysEquals([]byte(expetedTextual), textual) {
 		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expetedTextual), string(textual))
 	}
