@@ -11,15 +11,15 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro)
 
-* [Marshal/Unmarshal AVRO schema](schema-marshalunmarshal)
+* [Marshal/Unmarshal AVRO schema](#schema-marshalunmarshal)
 
 ### `github.com/khezen/avro/sqlavro`
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/sqlavro)
 
-* Discover SQL tables
-* [Convert SQL tables to AVRO schemas](convert-sql-table-to-avro-schema)
-* [Query records from SQL into AVRO bytes](query-records-from-sql-into-avro-bytes)
+* [Discover SQL tables]((#convert-sql-table-to-avro-schema))
+* [Convert SQL tables to AVRO schemas](#convert-sql-table-to-avro-schema)
+* [Query records from SQL into AVRO bytes](#query-records-from-sql-into-avro-bytes)
 
 ## What is AVRO
 
