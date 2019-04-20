@@ -22,6 +22,13 @@ func renderSQLFields(schema *avro.RecordSchema) ([]interface{}, error) {
 }
 
 func renderSQLField(schema avro.Schema) (interface{}, error) {
+	if schema.TypeName() == avro.TypeUnion {
+		return renderSQLFieldUnion(schema)
+	}
+	return renderSQLFieldSingle(schema)
+}
+
+func renderSQLFieldSingle(schema avro.Schema) (interface{}, error) {
 	switch schema.TypeName() {
 	case avro.TypeInt64:
 		var field int64
@@ -52,49 +59,51 @@ func renderSQLField(schema avro.Schema) (interface{}, error) {
 	case avro.TypeBytes, avro.TypeFixed, avro.Type(avro.LogicalTypeDecimal):
 		var field []byte
 		return &field, nil
-	case avro.TypeUnion:
-		types := schema.(avro.UnionSchema)
-		isNullable := false
-		var subSchema avro.Schema
-		if len(types) > 2 {
-			return nil, ErrUnsupportedTypeForSQL
+	}
+	return nil, ErrUnsupportedTypeForSQL
+}
+
+func renderSQLFieldUnion(schema avro.Schema) (interface{}, error) {
+	types := schema.(avro.UnionSchema)
+	isNullable := false
+	var subSchema avro.Schema
+	if len(types) > 2 {
+		return nil, ErrUnsupportedTypeForSQL
+	}
+	for _, t := range types {
+		if t.TypeName() == avro.TypeNull {
+			isNullable = true
+		} else {
+			subSchema = t
 		}
-		for _, t := range types {
-			if t.TypeName() == avro.TypeNull {
-				isNullable = true
-			} else {
-				subSchema = t
-			}
-		}
-		if !isNullable {
-			return nil, ErrUnsupportedTypeForSQL
-		}
-		switch subSchema.TypeName() {
-		case avro.TypeFloat32, avro.TypeFloat64:
-			var field sql.NullFloat64
-			return &field, nil
-		case avro.TypeInt32, avro.TypeInt64:
-			var field sql.NullInt64
-			return &field, nil
-		case avro.TypeString, avro.Type(avro.LogicalTypeDate), avro.Type(avro.LogicalTypeTime):
+	}
+	if !isNullable {
+		return nil, ErrUnsupportedTypeForSQL
+	}
+	switch subSchema.TypeName() {
+	case avro.TypeFloat32, avro.TypeFloat64:
+		var field sql.NullFloat64
+		return &field, nil
+	case avro.TypeInt32, avro.TypeInt64:
+		var field sql.NullInt64
+		return &field, nil
+	case avro.TypeString, avro.Type(avro.LogicalTypeDate), avro.Type(avro.LogicalTypeTime):
+		var field sql.NullString
+		return &field, nil
+	case avro.Type(avro.LogicalTypeTimestamp):
+		switch subSchema.(*avro.DerivedPrimitiveSchema).Documentation {
+		case string(DateTime):
 			var field sql.NullString
 			return &field, nil
-		case avro.Type(avro.LogicalTypeTimestamp):
-			switch subSchema.(*avro.DerivedPrimitiveSchema).Documentation {
-			case string(DateTime):
-				var field sql.NullString
-				return &field, nil
-			case "", string(Timestamp):
-				var field sql.NullInt64
-				return &field, nil
-			default:
-				return nil, ErrUnsupportedTypeForSQL
-			}
-		case avro.TypeBytes, avro.TypeFixed, avro.Type(avro.LogicalTypeDecimal):
-			var field []byte
+		case "", string(Timestamp):
+			var field sql.NullInt64
 			return &field, nil
+		default:
+			return nil, ErrUnsupportedTypeForSQL
 		}
-		return nil, ErrUnsupportedTypeForSQL
+	case avro.TypeBytes, avro.TypeFixed, avro.Type(avro.LogicalTypeDecimal):
+		var field []byte
+		return &field, nil
 	}
 	return nil, ErrUnsupportedTypeForSQL
 }
