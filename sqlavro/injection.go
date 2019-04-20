@@ -4,12 +4,12 @@ import "bytes"
 
 var (
 	rogueRunes = map[rune]struct{}{
-		'\'': struct{}{},
-		'`':  struct{}{},
-		'(':  struct{}{},
-		';':  struct{}{},
-		'*':  struct{}{},
-		'\\': struct{}{},
+		'\'': {},
+		'`':  {},
+		'(':  {},
+		';':  {},
+		'*':  {},
+		'\\': {},
 	}
 )
 
