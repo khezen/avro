@@ -44,6 +44,9 @@ func ExampleQuery() {
 		"2009-04-10 00:00:00",
 		"4.2",
 	)
+	if err != nil {
+		panic(err)
+	}
 	schema, err := sqlavro.SQLTable2AVRO(db, "blog", "posts")
 	if err != nil {
 		panic(err)
