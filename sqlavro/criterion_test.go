@@ -33,8 +33,8 @@ func TestCriterion(t *testing.T) {
 		{"test", avro.TypeInt64, &long, long, nil, avro.Ascending, ">", "ASC", nil},
 		{"test", avro.TypeFloat64, &double, double, nil, avro.Descending, "<", "DESC", nil},
 		{"test", avro.TypeString, nilString, nilInterface, nil, "", ">", "ASC", nil},
-		{"test", avro.TypeString, nilString, nilInterface, nil, "Ignore", ">", "ASC", ErrCannotIgnoreOrder},
-		{"test", avro.TypeString, nilString, nilInterface, nil, "Something", ">", "ASC", ErrCannotIgnoreOrder},
+		{"test", avro.TypeString, nilString, nilInterface, nil, "Ignore", "", "", ErrCannotIgnoreOrder},
+		{"test", avro.TypeString, nilString, nilInterface, nil, "Something", "", "", ErrCannotIgnoreOrder},
 		{"test", avro.TypeString, &str, str, nil, "", ">", "ASC", nil},
 		{"test", avro.Type(avro.LogicalTypeDate), &date, date.Format(SQLDateFormat), nil, "", ">", "ASC", nil},
 		{"test", avro.Type(avro.LogicalTypeTimestamp), &datetime, datetime.Format(SQLDateTimeFormat), nil, "", ">", "ASC", nil},
@@ -66,9 +66,6 @@ func TestCriterion(t *testing.T) {
 		if err != c.expectedLimitErr {
 			t.Errorf("expected %v, got %v", c.expectedLimitErr, err)
 		}
-		if err != nil {
-			continue
-		}
 		if limit != c.expectedLimit {
 			t.Errorf("expected %v, got %v", c.limit, limit)
 		}
@@ -76,19 +73,15 @@ func TestCriterion(t *testing.T) {
 		if err != c.expectedOrderErr {
 			t.Errorf("expected %v, got %v", c.expectedOrderErr, err)
 		}
-		if err == nil {
-			if !strings.EqualFold(c.expectedOperand, operand) {
-				t.Errorf("expected %v, got %v", c.expectedOperand, operand)
-			}
+		if !strings.EqualFold(c.expectedOperand, operand) {
+			t.Errorf("expected %v, got %v", c.expectedOperand, operand)
 		}
 		sort, err := criterion.OrderSort()
 		if err != c.expectedOrderErr {
 			t.Errorf("expected %v, got %v", c.expectedOrderErr, err)
 		}
-		if err == nil {
-			if !strings.EqualFold(c.expectedSort, sort) {
-				t.Errorf("expected %v, got %v", c.expectedSort, sort)
-			}
+		if !strings.EqualFold(c.expectedSort, sort) {
+			t.Errorf("expected %v, got %v", c.expectedSort, sort)
 		}
 	}
 }
