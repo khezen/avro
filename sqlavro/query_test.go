@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -128,7 +129,6 @@ func TestQuery(t *testing.T) {
 				4242,
 				4242.4242,
 				42.42,
-
 				sql.NullString{Valid: true, String: "2009-04-10"},
 				sql.NullString{Valid: true, String: "00:00:00"},
 				sql.NullInt64{Valid: true, Int64: 1254614400},
@@ -146,11 +146,20 @@ func TestQuery(t *testing.T) {
 	mock.ExpectQuery(
 		"SELECT (.+) FROM `blog`.`posts`(.*)",
 	).WillReturnRows(mockPostsRows)
-	avroBytes, err := Query(db, &schemas[0], 10, Criterion{
-		FieldName: "post_date",
-		Type:      avro.Type(avro.LogicalTypeTimestamp),
-		RawLimit:  []byte("1970-01-01T00:00:00Z"),
-	})
+	avroBytes, err := Query(db, &schemas[0], 10,
+		Criterion{
+			FieldName: "post_date",
+			RawLimit:  []byte("1970-01-01"),
+		},
+		Criterion{
+			FieldName: "post_datetime",
+			RawLimit:  []byte("1970-01-01T00:00:00Z"),
+		},
+		Criterion{
+			FieldName: "update_timestamp",
+			RawLimit:  []byte(strconv.FormatInt(0, 10)),
+		},
+	)
 	if err != nil {
 		t.Error(err)
 	}

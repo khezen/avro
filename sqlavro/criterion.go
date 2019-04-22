@@ -10,10 +10,14 @@ import (
 
 // Criterion -
 type Criterion struct {
-	FieldName string          `json:"field"`
-	Type      avro.Type       `json:"type"`
+	FieldName string `json:"field"`
+	typeName  avro.Type
 	RawLimit  json.RawMessage `json:"limit,omitempty"`
 	Order     avro.Order      `json:"order,omitempty"` // default: Ascending
+}
+
+func (c *Criterion) setType(typeName avro.Type) {
+	c.typeName = typeName
 }
 
 // Limit -
@@ -21,7 +25,7 @@ func (c *Criterion) Limit() (interface{}, error) {
 	if c.RawLimit == nil {
 		return nil, nil
 	}
-	switch c.Type {
+	switch c.typeName {
 	case avro.TypeFloat32, avro.TypeFloat64:
 		return strconv.ParseFloat(string(c.RawLimit), 64)
 	case avro.TypeInt32, avro.TypeInt64:
@@ -84,7 +88,7 @@ func NewCriterionFloat64(fieldName string, limit *float64, order avro.Order) *Cr
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		Type:      avro.TypeFloat64,
+		typeName:  avro.TypeFloat64,
 		RawLimit:  limitBytes,
 		Order:     order,
 	}
@@ -98,7 +102,7 @@ func NewCriterionInt64(fieldName string, limit *int64, order avro.Order) *Criter
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		Type:      avro.TypeInt64,
+		typeName:  avro.TypeInt64,
 		RawLimit:  limitBytes,
 		Order:     order,
 	}
@@ -112,7 +116,7 @@ func NewCriterionString(fieldName string, limit *string, order avro.Order) *Crit
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		Type:      avro.TypeString,
+		typeName:  avro.TypeString,
 		RawLimit:  limitBytes,
 		Order:     order,
 	}
@@ -126,7 +130,7 @@ func NewCriterionDateTime(fieldName string, limit *time.Time, order avro.Order) 
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		Type:      avro.Type(avro.LogicalTypeTimestamp),
+		typeName:  avro.Type(avro.LogicalTypeTimestamp),
 		RawLimit:  limitBytes,
 		Order:     order,
 	}
@@ -140,7 +144,7 @@ func NewCriterionDate(fieldName string, limit *time.Time, order avro.Order) *Cri
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		Type:      avro.Type(avro.LogicalTypeDate),
+		typeName:  avro.Type(avro.LogicalTypeDate),
 		RawLimit:  limitBytes,
 		Order:     order,
 	}
@@ -154,7 +158,7 @@ func NewCriterionTime(fieldName string, limit *time.Time, order avro.Order) *Cri
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		Type:      avro.Type(avro.LogicalTypeTime),
+		typeName:  avro.Type(avro.LogicalTypeTime),
 		RawLimit:  limitBytes,
 		Order:     order,
 	}
