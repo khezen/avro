@@ -159,6 +159,10 @@ func TestQuery(t *testing.T) {
 			FieldName: "update_timestamp",
 			RawLimit:  []byte(strconv.FormatInt(0, 10)),
 		},
+		Criterion{
+			FieldName: "update_time",
+			RawLimit:  nil,
+		},
 	)
 	if err != nil {
 		t.Error(err)
