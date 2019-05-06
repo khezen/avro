@@ -44,13 +44,16 @@ func ExampleQuery() {
 		"2009-04-10 00:00:00",
 		"4.2",
 	)
+	if err != nil {
+		panic(err)
+	}
 	schema, err := sqlavro.SQLTable2AVRO(db, "blog", "posts")
 	if err != nil {
 		panic(err)
 	}
 	limit := 1000
 	order := avro.Ascending
-	from, err := time.Parse("2006-02-01 15:04:03", "2009-04-10 00:00:00")
+	from, err := time.Parse("2006-02-01 15:04:05", "2009-04-10 00:00:00")
 	if err != nil {
 		panic(err)
 	}

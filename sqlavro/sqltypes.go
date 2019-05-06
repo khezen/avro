@@ -1,5 +1,7 @@
 package sqlavro
 
+import "github.com/khezen/avro"
+
 // SQLType -
 type SQLType string
 
@@ -75,3 +77,22 @@ const (
 	// SQLTimeFormat -
 	SQLTimeFormat = "15:04:05"
 )
+
+func underlyingType(union avro.UnionSchema) (avro.Schema, error) {
+	isNullable := false
+	var subSchema avro.Schema
+	if len(union) > 2 {
+		return nil, ErrUnsupportedTypeForSQL
+	}
+	for _, t := range union {
+		if t.TypeName() == avro.TypeNull {
+			isNullable = true
+		} else {
+			subSchema = t
+		}
+	}
+	if !isNullable {
+		return nil, ErrUnsupportedTypeForSQL
+	}
+	return subSchema, nil
+}

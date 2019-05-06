@@ -7,6 +7,8 @@ var (
 	ErrExpectRecordSchema = errors.New("ErrExpectRecordSchema")
 	// ErrUnsupportedTypeForCriterion -
 	ErrUnsupportedTypeForCriterion = errors.New("ErrUnsupportedTypeForCriterion")
+	// ErrCriterionUnknownField -
+	ErrCriterionUnknownField = errors.New("ErrCriterionUnknownField")
 	// ErrCannotIgnoreOrder -
 	ErrCannotIgnoreOrder = errors.New("ErrCannotIgnoreOrder")
 	// ErrUnsupportedTypeForSQL -
