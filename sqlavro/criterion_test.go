@@ -15,9 +15,9 @@ func TestCriterion(t *testing.T) {
 		str                = "A"
 		long         int64 = 30
 		double             = 30.30
-	// date               = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
-	// datetime           = time.Date(1970, 1, 1, 19, 7, 0, 0, time.UTC)
-	// clock              = time.Date(0, 0, 0, 19, 7, 0, 0, time.UTC)
+		date               = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+		datetime           = time.Date(1970, 1, 1, 19, 7, 0, 0, time.UTC)
+		clock              = time.Date(0, 0, 0, 19, 7, 0, 0, time.UTC)
 	)
 	cases := []struct {
 		fieldName        string
@@ -36,9 +36,9 @@ func TestCriterion(t *testing.T) {
 		{"test", avro.TypeString, nilString, nilInterface, nil, "Ignore", "", "", ErrCannotIgnoreOrder},
 		{"test", avro.TypeString, nilString, nilInterface, nil, "Something", "", "", ErrCannotIgnoreOrder},
 		{"test", avro.TypeString, &str, str, nil, "", ">", "ASC", nil},
-		// {"test", avro.Type(avro.LogicalTypeDate), &date, date.Format(SQLDateFormat), nil, "", ">", "ASC", nil},
-		// {"test", avro.Type(avro.LogicalTypeTimestamp), &datetime, datetime.Format(SQLDateTimeFormat), nil, "", ">", "ASC", nil},
-		// {"test", avro.Type(avro.LogicalTypeTime), &clock, clock.Format(SQLTimeFormat), nil, "", ">", "ASC", nil},
+		{"test", avro.Type(avro.LogicalTypeDate), &date, date.Format(SQLDateFormat), nil, "", ">", "ASC", nil},
+		{"test", avro.Type(avro.LogicalTypeTimestamp), &datetime, datetime.Format(SQLDateTimeFormat), nil, "", ">", "ASC", nil},
+		{"test", avro.Type(avro.LogicalTypeTime), &clock, clock.Format(SQLTimeFormat), nil, "", ">", "ASC", nil},
 	}
 	for _, c := range cases {
 		var criterion *Criterion
