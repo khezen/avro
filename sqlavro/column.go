@@ -1,6 +1,7 @@
 package sqlavro
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 	if err != nil {
 		return nil, err
 	}
-	if defaultValue != nil {
+	if defaultValue != nil && len(defaultValue) > 0 {
 		defaultValue = sqlDefault2AVRODefault(dataType, defaultValue)
 	}
 	if isNullable {
@@ -24,10 +25,15 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 			fieldType = avro.UnionSchema([]avro.Schema{fieldType, avro.TypeNull})
 		}
 	}
+	var rawDefault *json.RawMessage
+	if defaultValue != nil && len(defaultValue) > 0 {
+		rawDefault = new(json.RawMessage)
+		*rawDefault = defaultValue
+	}
 	return &avro.RecordFieldSchema{
 		Name:    columnName,
 		Type:    fieldType,
-		Default: defaultValue,
+		Default: rawDefault,
 	}, nil
 }
 

@@ -8,12 +8,12 @@ import (
 
 // RecordFieldSchema -
 type RecordFieldSchema struct {
-	Name          string          `json:"name"`
-	Aliases       []string        `json:"aliases,omitempty"`
-	Documentation string          `json:"doc,omitempty"`
-	Type          Schema          `json:"type"`
-	Default       json.RawMessage `json:"default,omitempty"`
-	Order         Order           `json:"order,omitempty"`
+	Name          string           `json:"name"`
+	Aliases       []string         `json:"aliases,omitempty"`
+	Documentation string           `json:"doc,omitempty"`
+	Type          Schema           `json:"type"`
+	Default       *json.RawMessage `json:"default,omitempty"`
+	Order         Order            `json:"order,omitempty"`
 }
 
 // Order - specifies how this field impacts sort ordering of this record (optional).
@@ -39,7 +39,7 @@ func translateValueToRecordFieldSchema(value *fastjson.Value, additionalTypes ..
 	}
 	var (
 		order        Order
-		defaultValue []byte
+		defaultValue *json.RawMessage
 	)
 	if value.Exists("order") {
 		order = Order(value.GetStringBytes("order"))
@@ -48,7 +48,8 @@ func translateValueToRecordFieldSchema(value *fastjson.Value, additionalTypes ..
 		}
 	}
 	if value.Exists("default") {
-		defaultValue = value.Get("default").MarshalTo(defaultValue)
+		defaultValue = new(json.RawMessage)
+		*defaultValue = value.Get("default").MarshalTo(*defaultValue)
 	}
 	_, name, documentation, aliases, err := translateValueToMetaFields(value)
 	if err != nil {
@@ -59,7 +60,7 @@ func translateValueToRecordFieldSchema(value *fastjson.Value, additionalTypes ..
 		Aliases:       aliases,
 		Documentation: documentation,
 		Type:          anySchema,
-		Default:       json.RawMessage(defaultValue),
+		Default:       defaultValue,
 		Order:         order,
 	}, nil
 }
