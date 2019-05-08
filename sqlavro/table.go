@@ -19,7 +19,7 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 	params = append(params, tableName)
 	if len(dbName) > 0 {
 		qBuf.WriteString(` AND TABLE_SCHEMA=?`)
-		params = append(params, tableName)
+		params = append(params, dbName)
 	}
 	rows, err := db.Query(
 		qBuf.String(),
