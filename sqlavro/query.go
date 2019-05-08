@@ -91,7 +91,17 @@ func renderQuery(schema *avro.RecordSchema, limit int, criteria []Criterion) (st
 	if criteriaLen == 0 {
 		return qBuf.String(), params, nil
 	}
-	qBuf.WriteString("WHERE")
+	var limitCriteriaLen int
+	for _, criterion := range criteria {
+		critLimit, err := criterion.Limit()
+		if err != nil {
+			return "", nil, err
+		}
+		if critLimit != nil {
+			limitCriteriaLen++
+		}
+	}
+	qBuf.WriteString(" WHERE")
 	for i, criterion := range criteria {
 		critLimit, err := criterion.Limit()
 		if err != nil {
@@ -109,7 +119,7 @@ func renderQuery(schema *avro.RecordSchema, limit int, criteria []Criterion) (st
 		qBuf.WriteRune('`')
 		qBuf.WriteString(operand)
 		qBuf.WriteString("?")
-		if i < criteriaLen-1 {
+		if i < limitCriteriaLen-1 {
 			qBuf.WriteString(" AND")
 		}
 		params = append(params, critLimit)
