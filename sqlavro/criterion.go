@@ -2,6 +2,7 @@ package sqlavro
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -12,8 +13,8 @@ import (
 type Criterion struct {
 	FieldName string `json:"field"`
 	typeName  avro.Type
-	RawLimit  json.RawMessage `json:"limit,omitempty"`
-	Order     avro.Order      `json:"order,omitempty"` // default: Ascending
+	RawLimit  *json.RawMessage `json:"limit,omitempty"`
+	Order     avro.Order       `json:"order,omitempty"` // default: Ascending
 }
 
 func (c *Criterion) setType(typeName avro.Type) {
@@ -27,39 +28,35 @@ func (c *Criterion) Limit() (interface{}, error) {
 	}
 	switch c.typeName {
 	case avro.TypeFloat32, avro.TypeFloat64:
-		return strconv.ParseFloat(string(c.RawLimit), 64)
+		return strconv.ParseFloat(string(*c.RawLimit), 64)
 	case avro.TypeInt32, avro.TypeInt64:
-		return strconv.ParseInt(string(c.RawLimit), 10, 64)
+		return strconv.ParseInt(string(*c.RawLimit), 10, 64)
 	case avro.TypeString,
 		avro.Type(avro.LogicalTypeTimestamp),
 		avro.Type(avro.LogicalTypeDate),
 		avro.Type(avro.LogicalTypeTime):
-		// var string(c.RawLimit) string
-		// err := json.Unmarshal(c.RawLimit, &string(c.RawLimit))
-		// if err != nil {
-		// 	return nil, err
-		// }
+		dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
 		switch c.typeName {
 		case avro.TypeString:
-			return string(c.RawLimit), nil
+			return dst, nil
 		case avro.Type(avro.LogicalTypeTimestamp):
-			t, err := time.Parse(time.RFC3339Nano, string(c.RawLimit))
+			t, err := time.Parse(time.RFC3339Nano, dst)
 			if err != nil {
 				return nil, err
 			}
 			return t.Format(SQLDateTimeFormat), nil
 		case avro.Type(avro.LogicalTypeDate):
-			_, err := time.Parse(SQLDateFormat, string(c.RawLimit))
+			_, err := time.Parse(SQLDateFormat, dst)
 			if err != nil {
 				return nil, err
 			}
-			return string(c.RawLimit), nil
+			return dst, nil
 		case avro.Type(avro.LogicalTypeTime):
-			_, err := time.Parse(SQLTimeFormat, string(c.RawLimit))
+			_, err := time.Parse(SQLTimeFormat, dst)
 			if err != nil {
 				return nil, err
 			}
-			return string(c.RawLimit), nil
+			return dst, nil
 		default:
 			return nil, ErrUnsupportedTypeForCriterion
 		}
@@ -94,9 +91,10 @@ func (c *Criterion) OrderSort() (string, error) {
 
 // NewCriterionFloat64 -
 func NewCriterionFloat64(fieldName string, limit *float64, order avro.Order) *Criterion {
-	var limitBytes []byte
+	var limitBytes *json.RawMessage
 	if limit != nil {
-		limitBytes = []byte(strconv.FormatFloat(*limit, 'f', -1, 32))
+		limitBytes = new(json.RawMessage)
+		*limitBytes = []byte(strconv.FormatFloat(*limit, 'f', -1, 32))
 	}
 	return &Criterion{
 		FieldName: fieldName,
@@ -108,9 +106,10 @@ func NewCriterionFloat64(fieldName string, limit *float64, order avro.Order) *Cr
 
 // NewCriterionInt64 -
 func NewCriterionInt64(fieldName string, limit *int64, order avro.Order) *Criterion {
-	var limitBytes []byte
+	var limitBytes *json.RawMessage
 	if limit != nil {
-		limitBytes = []byte(strconv.FormatInt(*limit, 10))
+		limitBytes = new(json.RawMessage)
+		*limitBytes = []byte(strconv.FormatInt(*limit, 10))
 	}
 	return &Criterion{
 		FieldName: fieldName,
@@ -122,9 +121,10 @@ func NewCriterionInt64(fieldName string, limit *int64, order avro.Order) *Criter
 
 // NewCriterionString -
 func NewCriterionString(fieldName string, limit *string, order avro.Order) *Criterion {
-	var limitBytes []byte
+	var limitBytes *json.RawMessage
 	if limit != nil {
-		limitBytes = []byte(*limit)
+		limitBytes = new(json.RawMessage)
+		*limitBytes = []byte(fmt.Sprintf(`"%s"`, *limit))
 	}
 	return &Criterion{
 		FieldName: fieldName,
@@ -136,9 +136,10 @@ func NewCriterionString(fieldName string, limit *string, order avro.Order) *Crit
 
 // NewCriterionDateTime -
 func NewCriterionDateTime(fieldName string, limit *time.Time, order avro.Order) *Criterion {
-	var limitBytes []byte
+	var limitBytes *json.RawMessage
 	if limit != nil {
-		limitBytes = []byte(limit.Format(time.RFC3339Nano))
+		limitBytes = new(json.RawMessage)
+		*limitBytes = []byte(fmt.Sprintf(`"%s"`, limit.Format(time.RFC3339Nano)))
 	}
 	return &Criterion{
 		FieldName: fieldName,
@@ -150,9 +151,10 @@ func NewCriterionDateTime(fieldName string, limit *time.Time, order avro.Order) 
 
 // NewCriterionDate -
 func NewCriterionDate(fieldName string, limit *time.Time, order avro.Order) *Criterion {
-	var limitBytes []byte
+	var limitBytes *json.RawMessage
 	if limit != nil {
-		limitBytes = []byte(limit.Format(SQLDateFormat))
+		limitBytes = new(json.RawMessage)
+		*limitBytes = []byte(fmt.Sprintf(`"%s"`, limit.Format(SQLDateFormat)))
 	}
 	return &Criterion{
 		FieldName: fieldName,
@@ -164,9 +166,10 @@ func NewCriterionDate(fieldName string, limit *time.Time, order avro.Order) *Cri
 
 // NewCriterionTime -
 func NewCriterionTime(fieldName string, limit *time.Time, order avro.Order) *Criterion {
-	var limitBytes []byte
+	var limitBytes *json.RawMessage
 	if limit != nil {
-		limitBytes = []byte(limit.Format(SQLTimeFormat))
+		limitBytes = new(json.RawMessage)
+		*limitBytes = []byte(fmt.Sprintf(`"%s"`, limit.Format(SQLTimeFormat)))
 	}
 	return &Criterion{
 		FieldName: fieldName,

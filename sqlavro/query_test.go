@@ -146,18 +146,21 @@ func TestQuery(t *testing.T) {
 	mock.ExpectQuery(
 		"SELECT (.+) FROM `blog`.`posts`(.*)",
 	).WillReturnRows(mockPostsRows)
+	dateStr := json.RawMessage(`"1970-01-01"`)
+	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00Z"`)
+	timeStampStr := json.RawMessage(strconv.FormatInt(0, 10))
 	avroBytes, err := Query(db, &schemas[0], 10,
 		Criterion{
 			FieldName: "post_date",
-			RawLimit:  []byte("1970-01-01"),
+			RawLimit:  &dateStr,
 		},
 		Criterion{
 			FieldName: "post_datetime",
-			RawLimit:  []byte("1970-01-01T00:00:00Z"),
+			RawLimit:  &dateTimeStr,
 		},
 		Criterion{
 			FieldName: "update_timestamp",
-			RawLimit:  []byte(strconv.FormatInt(0, 10)),
+			RawLimit:  &timeStampStr,
 		},
 		Criterion{
 			FieldName: "update_time",
