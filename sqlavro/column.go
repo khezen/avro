@@ -31,7 +31,7 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 		*rawDefault = defaultValue
 	}
 	return &avro.RecordFieldSchema{
-		Name:    columnName,
+		Name:    formatString(columnName),
 		Type:    fieldType,
 		Default: rawDefault,
 	}, nil

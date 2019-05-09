@@ -63,8 +63,8 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 	}
 	return &avro.RecordSchema{
 		Type:      avro.TypeRecord,
-		Namespace: tableSchema,
-		Name:      tableName,
+		Namespace: formatString(tableSchema),
+		Name:      formatString(tableName),
 		Fields:    fields,
 	}, nil
 }
