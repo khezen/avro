@@ -10,8 +10,8 @@ import (
 )
 
 // Query -
-func Query(db *sql.DB, schema *avro.RecordSchema, limit int, criteria ...Criterion) (avroBytes []byte, err error) {
-	native, err := query2Native(db, schema, limit, criteria)
+func Query(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, criteria ...Criterion) (avroBytes []byte, err error) {
+	native, err := query2Native(db, dbName, schema, limit, criteria)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,8 @@ func Query(db *sql.DB, schema *avro.RecordSchema, limit int, criteria ...Criteri
 	return avroBytes, nil
 }
 
-func query2Native(db *sql.DB, schema *avro.RecordSchema, limit int, criteria []Criterion) ([]map[string]interface{}, error) {
-	statement, params, err := renderQuery(schema, limit, criteria)
+func query2Native(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, criteria []Criterion) ([]map[string]interface{}, error) {
+	statement, params, err := renderQuery(dbName, schema, limit, criteria)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func query2Native(db *sql.DB, schema *avro.RecordSchema, limit int, criteria []C
 	return records, nil
 }
 
-func renderQuery(schema *avro.RecordSchema, limit int, criteria []Criterion) (statement string, params []interface{}, err error) {
+func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria []Criterion) (statement string, params []interface{}, err error) {
 	fieldsLen := len(schema.Fields)
 	if fieldsLen == 0 {
 		return "", nil, ErrExpectRecordSchema
@@ -82,7 +82,7 @@ func renderQuery(schema *avro.RecordSchema, limit int, criteria []Criterion) (st
 	qBuf.WriteString(sqlEscape(schema.Fields[fieldsLen-1].Name))
 	qBuf.WriteString("` FROM `")
 	if len(schema.Namespace) > 0 {
-		qBuf.WriteString(sqlEscape(schema.Namespace))
+		qBuf.WriteString(sqlEscape(dbName))
 		qBuf.WriteString("`.`")
 	}
 	qBuf.WriteString(sqlEscape(schema.Name))
