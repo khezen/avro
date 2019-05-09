@@ -61,10 +61,16 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 		}
 		fields = append(fields, *field)
 	}
+	formattedName := formatString(tableName)
+	var aliases []string
+	if formattedName != tableName {
+		aliases = []string{tableName}
+	}
 	return &avro.RecordSchema{
 		Type:      avro.TypeRecord,
 		Namespace: formatString(tableSchema),
-		Name:      formatString(tableName),
+		Name:      formattedName,
+		Aliases:   aliases,
 		Fields:    fields,
 	}, nil
 }

@@ -30,8 +30,15 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 		rawDefault = new(json.RawMessage)
 		*rawDefault = defaultValue
 	}
+	formattedName := formatString(columnName)
+	var aliases []string
+	if formattedName != columnName {
+		aliases = []string{columnName}
+	}
 	return &avro.RecordFieldSchema{
-		Name:    formatString(columnName),
+
+		Name:    formattedName,
+		Aliases: aliases,
 		Type:    fieldType,
 		Default: rawDefault,
 	}, nil
