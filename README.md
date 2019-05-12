@@ -298,6 +298,34 @@ func main() {
 
 ```
 
+If the record fields contains aliases, then the first alias is used in the query instead of the field name.
+
+#### types mapping
+
+| Avro               | Go                       | SQL
+| ------------------ | ------------------------ | ---
+| `null`             | `nil`                    | `NULL`
+| `bytes`            | `[]byte`                 | `BLOB`,`MEDIUMBLOB`,`LONGBLOB`
+| `float`            | `float32`                | `FLOAT`
+| `double`           | `float64`                | `DOUBLE`
+| `long`             | `int64`                  | `BIGINT`
+| `int`              | `int32`                  | `TINYINT`,`SMALLINT`,`INT`,`YEAR`
+| `string`,`enum`    | `string`                 | `VARCHAR`, `NVARCHAR`,`TEXT`,`TINYTEXT`,`MEDIUMTEXT`,`LONGTEXT`,`ENUM`,`SET`
+| `array`            | `[]interface{}`          | **N/A**
+| `fixed`            | `[]byte`                 | `CHAR`,`NCHAR`
+| `map` and `record` | `map[string]interface{}` | **N/A**
+| `decimal`          | `*big.Rat`               | `DECIMAL`
+| `time`             | `int32`                  | `TIME`
+| `timestamp`        | `int32`                  | `TIMESTAMP`,`DATETIME`
+| `date`             | `time.Time`              | `DATE`
+| `union`            | *see below*              | **any type nullable**
+
+Because of encoding rules for Avro unions, when an union's value is
+`null`, a simple Go `nil` is returned. However when an union's value
+is non-`nil`, a Go `map[string]interface{}` with a single key is
+returned for the union. The map's single key is the Avro type name and
+its value is the datum's value.
+
 ## Issues
 
 If you have any problems or questions, please ask for help through a [GitHub issue](https://github.com/khezen/avro/issues).
