@@ -315,8 +315,7 @@ If the record fields contains aliases, then the first alias is used in the query
 | `fixed`            | `[]byte`                 | `CHAR`,`NCHAR`
 | `map` and `record` | `map[string]interface{}` | **N/A**
 | `decimal`          | `*big.Rat`               | `DECIMAL`
-| `time`             | `int32`                  | `TIME`
-| `timestamp`        | `int32`                  | `TIMESTAMP`,`DATETIME`
+| `time`,`timestamp` | `int32`                  | `TIME`,`TIMESTAMP`,`DATETIME`
 | `date`             | `time.Time`              | `DATE`
 | `union`            | *see below*              | **any type nullable**
 
