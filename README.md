@@ -298,7 +298,7 @@ func main() {
 
 ```
 
-If the record fields contains aliases, then the first alias is used in the query instead of the field name.
+When record fields contains aliases, the first alias is used in the query instead of the field name.
 
 #### types mapping
 
