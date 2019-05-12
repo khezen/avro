@@ -317,7 +317,7 @@ If the record fields contains aliases, then the first alias is used in the query
 | `timestamp`        | `int32`                  | `TIMESTAMP`,`DATETIME`
 | `date`             | `time.Time`              | `DATE`
 | `array`            | `[]interface{}`          | **N/A**
-| `map` and `record` | `map[string]interface{}` | **N/A**
+| `map`,`record`     | `map[string]interface{}` | **N/A**
 | `union`            | *see below*              | **any type nullable**
 
 Because of encoding rules for Avro unions, when an union's value is
