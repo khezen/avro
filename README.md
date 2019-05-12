@@ -306,17 +306,18 @@ If the record fields contains aliases, then the first alias is used in the query
 | ------------------ | ------------------------ | ---
 | `null`             | `nil`                    | `NULL`
 | `bytes`            | `[]byte`                 | `BLOB`,`MEDIUMBLOB`,`LONGBLOB`
+| `fixed`            | `[]byte`                 | `CHAR`,`NCHAR`
+| `string`,`enum`    | `string`                 | `VARCHAR`, `NVARCHAR`,`TEXT`,`TINYTEXT`,`MEDIUMTEXT`,`LONGTEXT`,`ENUM`,`SET`
 | `float`            | `float32`                | `FLOAT`
 | `double`           | `float64`                | `DOUBLE`
 | `long`             | `int64`                  | `BIGINT`
 | `int`              | `int32`                  | `TINYINT`,`SMALLINT`,`INT`,`YEAR`
-| `string`,`enum`    | `string`                 | `VARCHAR`, `NVARCHAR`,`TEXT`,`TINYTEXT`,`MEDIUMTEXT`,`LONGTEXT`,`ENUM`,`SET`
-| `array`            | `[]interface{}`          | **N/A**
-| `fixed`            | `[]byte`                 | `CHAR`,`NCHAR`
-| `map` and `record` | `map[string]interface{}` | **N/A**
 | `decimal`          | `*big.Rat`               | `DECIMAL`
-| `time`,`timestamp` | `int32`                  | `TIME`,`TIMESTAMP`,`DATETIME`
+| `time`,`timestamp` | `int32`                  | `TIME`
+| `timestamp`        | `int32`                  | `TIMESTAMP`,`DATETIME`
 | `date`             | `time.Time`              | `DATE`
+| `array`            | `[]interface{}`          | **N/A**
+| `map` and `record` | `map[string]interface{}` | **N/A**
 | `union`            | *see below*              | **any type nullable**
 
 Because of encoding rules for Avro unions, when an union's value is
