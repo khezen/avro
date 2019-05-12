@@ -301,7 +301,7 @@ func main() {
 
 * When record fields contains aliases, the first alias is used in the query instead of the field name.
 
-#### types mapping
+#### Types
 
 | Avro               | Go                       | SQL
 | ------------------ | ------------------------ | ---
