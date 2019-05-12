@@ -73,19 +73,37 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 	}
 	params = make([]interface{}, 0, len(criteria)+2)
 	qBuf := bytes.NewBufferString("SELECT ")
+	var fieldName string
 	for i := 0; i < fieldsLen-1; i++ {
+		if len(schema.Fields[i].Aliases) > 0 {
+			fieldName = schema.Fields[i].Aliases[0]
+		} else {
+			fieldName = schema.Fields[i].Name
+		}
 		qBuf.WriteRune('`')
-		qBuf.WriteString(sqlEscape(schema.Fields[i].Name))
+		qBuf.WriteString(sqlEscape(fieldName))
 		qBuf.WriteString("`,")
 	}
+	lastIndex := fieldsLen - 1
+	if len(schema.Fields[lastIndex].Aliases) > 0 {
+		fieldName = schema.Fields[lastIndex].Aliases[0]
+	} else {
+		fieldName = schema.Fields[lastIndex].Name
+	}
 	qBuf.WriteRune('`')
-	qBuf.WriteString(sqlEscape(schema.Fields[fieldsLen-1].Name))
+	qBuf.WriteString(sqlEscape(fieldName))
 	qBuf.WriteString("` FROM `")
 	if len(schema.Namespace) > 0 {
 		qBuf.WriteString(sqlEscape(dbName))
 		qBuf.WriteString("`.`")
 	}
-	qBuf.WriteString(sqlEscape(schema.Name))
+	var tableName string
+	if len(schema.Aliases) > 0 {
+		tableName = schema.Aliases[0]
+	} else {
+		tableName = schema.Name
+	}
+	qBuf.WriteString(sqlEscape(tableName))
 	qBuf.WriteRune('`')
 	criteriaLen := len(criteria)
 	if criteriaLen == 0 {
