@@ -2,6 +2,7 @@ package sqlavro
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -39,11 +40,11 @@ func (c *Criterion) Limit() (interface{}, error) {
 		case avro.TypeString:
 			return dst, nil
 		case avro.Type(avro.LogicalTypeTimestamp):
-			t, err := time.Parse(time.RFC3339Nano, dst)
+			_, err := time.Parse(time.RFC3339Nano, dst)
 			if err != nil {
 				return nil, err
 			}
-			return t.Format(SQLDateTimeFormat), nil
+			return dst, nil
 		case avro.Type(avro.LogicalTypeDate):
 			_, err := time.Parse(SQLDateFormat, dst)
 			if err != nil {
@@ -62,6 +63,40 @@ func (c *Criterion) Limit() (interface{}, error) {
 	default:
 		return nil, ErrUnsupportedTypeForCriterion
 	}
+}
+
+func (c *Criterion) setLimit(limit interface{}) error {
+	if limit == nil {
+		return nil
+	}
+	var rawLimit json.RawMessage
+	switch c.typeName {
+	case avro.TypeFloat32, avro.TypeFloat64:
+		rawLimit = json.RawMessage(strconv.FormatFloat(limit.(float64), 'f', -1, 64))
+		break
+	case avro.TypeInt32, avro.TypeInt64:
+		rawLimit = json.RawMessage(strconv.FormatInt(limit.(int64), 10))
+		break
+	case avro.TypeString:
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit.(string)))
+		break
+	case avro.Type(avro.LogicalTypeTimestamp):
+		t := time.Date(0, 0, 0, 0, 0, limit.(int), 0, time.UTC)
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+		break
+	case avro.Type(avro.LogicalTypeDate):
+		t := time.Date(0, 0, 0, 0, 0, limit.(int), 0, time.UTC)
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(SQLDateFormat)))
+		break
+	case avro.Type(avro.LogicalTypeTime):
+		t := limit.(time.Time)
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+		break
+	default:
+		return ErrUnsupportedTypeForCriterion
+	}
+	c.RawLimit = &rawLimit
+	return nil
 }
 
 // OrderOperand -

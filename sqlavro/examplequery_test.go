@@ -57,7 +57,7 @@ func ExampleQuery() {
 	if err != nil {
 		panic(err)
 	}
-	avroBytes, err := sqlavro.Query(db, "blog", schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, order))
+	avroBytes, err := sqlavro.Query(db, "blog", schema, limit, *sqlavro.NewCriterionTimestamp("post_date", &from, order))
 	if err != nil {
 		panic(err)
 	}

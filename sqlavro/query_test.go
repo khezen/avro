@@ -147,7 +147,7 @@ func TestQuery(t *testing.T) {
 		"SELECT (.+) FROM `blog`.`posts`(.*)",
 	).WillReturnRows(mockPostsRows)
 	dateStr := json.RawMessage(`"1970-01-01"`)
-	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00Z"`)
+	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
 	timeStampStr := json.RawMessage(strconv.FormatInt(0, 10))
 	avroBytes, err := Query(db, "blog", &schemas[0], 10,
 		Criterion{

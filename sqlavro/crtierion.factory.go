@@ -9,12 +9,33 @@ import (
 	"github.com/khezen/avro"
 )
 
+// NewCriterion -
+func NewCriterion(field *avro.RecordFieldSchema, value interface{}, order avro.Order) (*Criterion, error) {
+	criterion := Criterion{
+		Order: order,
+	}
+	if len(field.Aliases) > 0 {
+		criterion.FieldName = field.Aliases[0]
+	} else {
+		criterion.FieldName = field.Name
+	}
+	err := ensureCriterionType(field, &criterion)
+	if err != nil {
+		return nil, err
+	}
+	err = criterion.setLimit(value)
+	if err != nil {
+		return nil, err
+	}
+	return &criterion, nil
+}
+
 // NewCriterionFloat64 -
 func NewCriterionFloat64(fieldName string, limit *float64, order avro.Order) *Criterion {
 	var limitBytes *json.RawMessage
 	if limit != nil {
 		limitBytes = new(json.RawMessage)
-		*limitBytes = []byte(strconv.FormatFloat(*limit, 'f', -1, 32))
+		*limitBytes = []byte(strconv.FormatFloat(*limit, 'f', -1, 64))
 	}
 	return &Criterion{
 		FieldName: fieldName,
@@ -54,8 +75,8 @@ func NewCriterionString(fieldName string, limit *string, order avro.Order) *Crit
 	}
 }
 
-// NewCriterionDateTime -
-func NewCriterionDateTime(fieldName string, limit *time.Time, order avro.Order) *Criterion {
+// NewCriterionTimestamp -
+func NewCriterionTimestamp(fieldName string, limit *time.Time, order avro.Order) *Criterion {
 	var limitBytes *json.RawMessage
 	if limit != nil {
 		limitBytes = new(json.RawMessage)
