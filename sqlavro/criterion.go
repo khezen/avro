@@ -11,10 +11,11 @@ import (
 
 // Criterion -
 type Criterion struct {
-	FieldName string `json:"field"`
-	typeName  avro.Type
-	RawLimit  *json.RawMessage `json:"limit,omitempty"`
-	Order     avro.Order       `json:"order,omitempty"` // default: Ascending
+	FieldName     string `json:"field"`
+	typeName      avro.Type
+	documentation string
+	RawLimit      *json.RawMessage `json:"limit,omitempty"`
+	Order         avro.Order       `json:"order,omitempty"` // default: Ascending
 }
 
 func (c *Criterion) setType(typeName avro.Type) {
@@ -40,11 +41,11 @@ func (c *Criterion) Limit() (interface{}, error) {
 		case avro.TypeString:
 			return dst, nil
 		case avro.Type(avro.LogicalTypeTimestamp):
-			_, err := time.Parse(time.RFC3339Nano, dst)
+			t, err := time.Parse(time.RFC3339Nano, dst)
 			if err != nil {
 				return nil, err
 			}
-			return dst, nil
+			return t.Format(SQLDateTimeFormat), nil
 		case avro.Type(avro.LogicalTypeDate):
 			_, err := time.Parse(SQLDateFormat, dst)
 			if err != nil {

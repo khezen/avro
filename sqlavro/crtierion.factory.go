@@ -75,8 +75,8 @@ func NewCriterionString(fieldName string, limit *string, order avro.Order) *Crit
 	}
 }
 
-// NewCriterionTimestamp -
-func NewCriterionTimestamp(fieldName string, limit *time.Time, order avro.Order) *Criterion {
+// NewCriterionDateTime -
+func NewCriterionDateTime(fieldName string, limit *time.Time, order avro.Order) *Criterion {
 	var limitBytes *json.RawMessage
 	if limit != nil {
 		limitBytes = new(json.RawMessage)

@@ -55,7 +55,7 @@ func TestCriterion(t *testing.T) {
 		case avro.Type(avro.LogicalTypeDate):
 			criterion = NewCriterionDate(c.fieldName, c.limit.(*time.Time), c.order)
 		case avro.Type(avro.LogicalTypeTimestamp):
-			criterion = NewCriterionTimestamp(c.fieldName, c.limit.(*time.Time), c.order)
+			criterion = NewCriterionDateTime(c.fieldName, c.limit.(*time.Time), c.order)
 		case avro.Type(avro.LogicalTypeTime):
 			criterion = NewCriterionTime(c.fieldName, c.limit.(*time.Time), c.order)
 		default:
