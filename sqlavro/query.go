@@ -11,13 +11,18 @@ import (
 
 // Query -
 func Query(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, criteria ...Criterion) (avroBytes []byte, newCriteria []Criterion, err error) {
-	native, err := query2Native(db, dbName, schema, limit, criteria)
+	records, err := query2Native(db, dbName, schema, limit, criteria)
 	if err != nil {
 		return nil, nil, err
 	}
-	newCriteria, err = updateCriteria(schema, native[len(native)-1], criteria)
-	if err != nil {
-		return nil, nil, err
+	recordsLen := len(records)
+	if recordsLen > 0 {
+		newCriteria, err = updateCriteria(schema, records[recordsLen-1], criteria)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		newCriteria = criteria
 	}
 	resultSchema := avro.ArraySchema{
 		Type:  avro.TypeArray,
