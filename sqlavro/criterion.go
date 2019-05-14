@@ -141,7 +141,7 @@ func extractRawLimit(typeName avro.Type, limit interface{}) (json.RawMessage, er
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit.(string)))
 		return rawLimit, nil
 	case avro.Type(avro.LogicalTypeTimestamp):
-		t := time.Date(0, 0, 0, 0, 0, int(limit.(int32)), 0, time.UTC)
+		t := time.Date(1970, 1, 1, 0, 0, int(limit.(int32)), 0, time.UTC)
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
 		return rawLimit, nil
 	case avro.Type(avro.LogicalTypeDate):
@@ -149,7 +149,7 @@ func extractRawLimit(typeName avro.Type, limit interface{}) (json.RawMessage, er
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(SQLDateFormat)))
 		return rawLimit, nil
 	case avro.Type(avro.LogicalTypeTime):
-		t := time.Date(0, 0, 0, 0, 0, int(limit.(int32)), 0, time.UTC)
+		t := time.Date(1970, 1, 1, 0, 0, int(limit.(int32)), 0, time.UTC)
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
 		return rawLimit, nil
 	default:
