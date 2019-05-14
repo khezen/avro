@@ -286,10 +286,11 @@ func main() {
   if err != nil {
     panic(err)
   }
-  avroBytes, err := sqlavro.Query(db, "blog", schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, order))
+  avroBytes, updatedCriteria, err := sqlavro.Query(db, "blog", schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, order))
   if err != nil {
     panic(err)
   }
+  fmt.Println(updatedCriteria)
   err = ioutil.WriteFile("/tmp/blog_posts.avro", avroBytes, 0644)
   if err != nil {
     panic(err)
