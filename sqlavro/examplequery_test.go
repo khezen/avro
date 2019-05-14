@@ -2,6 +2,7 @@ package sqlavro_test
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -57,7 +58,7 @@ func ExampleQuery() {
 	if err != nil {
 		panic(err)
 	}
-	avroBytes, err := sqlavro.Query(db, "blog", schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, order))
+	avroBytes, updatedCriteria, err := sqlavro.Query(db, "blog", schema, limit, *sqlavro.NewCriterionDateTime("post_date", &from, order))
 	if err != nil {
 		panic(err)
 	}
@@ -65,4 +66,5 @@ func ExampleQuery() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(updatedCriteria)
 }

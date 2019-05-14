@@ -149,7 +149,7 @@ func TestQuery(t *testing.T) {
 	dateStr := json.RawMessage(`"1970-01-01"`)
 	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
 	timeStampStr := json.RawMessage(strconv.FormatInt(0, 10))
-	avroBytes, err := Query(db, "blog", &schemas[0], 10,
+	avroBytes, _, err := Query(db, "blog", &schemas[0], 10,
 		Criterion{
 			FieldName: "post_date",
 			RawLimit:  &dateStr,

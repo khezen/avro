@@ -10,10 +10,14 @@ import (
 )
 
 // Query -
-func Query(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, criteria ...Criterion) (avroBytes []byte, err error) {
+func Query(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, criteria ...Criterion) (avroBytes []byte, newCriteria []Criterion, err error) {
 	native, err := query2Native(db, dbName, schema, limit, criteria)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	newCriteria, err = updateCriteria(schema, native[len(native)-1], criteria)
+	if err != nil {
+		return nil, nil, err
 	}
 	resultSchema := avro.ArraySchema{
 		Type:  avro.TypeArray,
@@ -21,17 +25,17 @@ func Query(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, crit
 	}
 	resultSchemaBytes, err := json.Marshal(resultSchema)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	codec, err := goavro.NewCodec(string(resultSchemaBytes))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	avroBytes, err = codec.BinaryFromNative(nil, native)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return avroBytes, nil
+	return avroBytes, newCriteria, nil
 }
 
 func query2Native(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, criteria []Criterion) ([]map[string]interface{}, error) {
@@ -160,4 +164,23 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 	qBuf.WriteString(" LIMIT ?")
 	params = append(params, limit)
 	return qBuf.String(), params, nil
+}
+
+func updateCriteria(schema *avro.RecordSchema, record map[string]interface{}, criteria []Criterion) (newCriteria []Criterion, err error) {
+	newCriteria = make([]Criterion, 0, len(criteria))
+	var newCrit *Criterion
+	for _, criterion := range criteria {
+		for _, field := range schema.Fields {
+			if criterion.FieldName == field.Name ||
+				(len(field.Aliases) > 0 && criterion.FieldName == field.Aliases[0]) {
+				newCrit, err = NewCriterion(&field, record[criterion.FieldName], criterion.Order)
+				if err != nil {
+					return nil, err
+				}
+				newCriteria = append(newCriteria, *newCrit)
+				break
+			}
+		}
+	}
+	return newCriteria, nil
 }
