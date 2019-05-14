@@ -36,7 +36,7 @@ func Query(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, crit
 	if err != nil {
 		return nil, nil, err
 	}
-	avroBytes, err = codec.BinaryFromNative(nil, native)
+	avroBytes, err = codec.BinaryFromNative(nil, records)
 	if err != nil {
 		return nil, nil, err
 	}
