@@ -314,7 +314,7 @@ func main() {
 | `long`             | `int64`                  | `BIGINT`
 | `int`              | `int32`                  | `TINYINT`,`SMALLINT`,`INT`,`YEAR`
 | `decimal`          | `*big.Rat`               | `DECIMAL`
-| `time`,`timestamp` | `int32`                  | `TIME`
+| `time`             | `int32`                  | `TIME`
 | `timestamp`        | `int32`                  | `TIMESTAMP`,`DATETIME`
 | `date`             | `time.Time`              | `DATE`
 | `array`            | `[]interface{}`          | **N/A**

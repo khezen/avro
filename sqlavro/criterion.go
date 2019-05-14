@@ -12,14 +12,14 @@ import (
 // Criterion -
 type Criterion struct {
 	FieldName     string `json:"field"`
-	typeName      avro.Type
+	fieldSchema   *avro.RecordFieldSchema
 	documentation string
 	RawLimit      *json.RawMessage `json:"limit,omitempty"`
 	Order         avro.Order       `json:"order,omitempty"` // default: Ascending
 }
 
-func (c *Criterion) setType(typeName avro.Type) {
-	c.typeName = typeName
+func (c *Criterion) setSchema(field avro.RecordFieldSchema) {
+	c.fieldSchema = &field
 }
 
 // Limit -
@@ -27,40 +27,59 @@ func (c *Criterion) Limit() (interface{}, error) {
 	if c.RawLimit == nil {
 		return nil, nil
 	}
-	switch c.typeName {
+	var (
+		schema avro.Schema
+		err    error
+	)
+	if c.fieldSchema.Type.TypeName() == avro.TypeUnion {
+		schema, err = underlyingType(c.fieldSchema.Type.(avro.UnionSchema))
+		if err != nil {
+			return nil, err
+		}
+
+	} else {
+		schema = c.fieldSchema.Type
+	}
+	return c.limit(schema)
+}
+
+func (c *Criterion) limit(schema avro.Schema) (interface{}, error) {
+	typeName := schema.TypeName()
+	switch typeName {
 	case avro.TypeFloat32, avro.TypeFloat64:
 		return strconv.ParseFloat(string(*c.RawLimit), 64)
 	case avro.TypeInt32, avro.TypeInt64:
 		return strconv.ParseInt(string(*c.RawLimit), 10, 64)
-	case avro.TypeString,
-		avro.Type(avro.LogicalTypeTimestamp),
-		avro.Type(avro.LogicalTypeDate),
-		avro.Type(avro.LogicalTypeTime):
-		dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
-		switch c.typeName {
-		case avro.TypeString:
-			return dst, nil
-		case avro.Type(avro.LogicalTypeTimestamp):
+	case avro.TypeString:
+		return string(*c.RawLimit)[1 : len(*c.RawLimit)-1], nil
+	case avro.Type(avro.LogicalTypeTimestamp):
+		switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
+		case "datetime":
+			dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
 			t, err := time.Parse(time.RFC3339Nano, dst)
 			if err != nil {
 				return nil, err
 			}
 			return t.Format(SQLDateTimeFormat), nil
-		case avro.Type(avro.LogicalTypeDate):
-			_, err := time.Parse(SQLDateFormat, dst)
-			if err != nil {
-				return nil, err
-			}
-			return dst, nil
-		case avro.Type(avro.LogicalTypeTime):
-			_, err := time.Parse(SQLTimeFormat, dst)
-			if err != nil {
-				return nil, err
-			}
-			return dst, nil
+		case "timestamp":
+			return strconv.ParseInt(string(*c.RawLimit), 10, 64)
 		default:
 			return nil, ErrUnsupportedTypeForCriterion
 		}
+	case avro.Type(avro.LogicalTypeDate):
+		dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
+		_, err := time.Parse(SQLDateFormat, dst)
+		if err != nil {
+			return nil, err
+		}
+		return dst, nil
+	case avro.Type(avro.LogicalTypeTime):
+		dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
+		_, err := time.Parse(SQLTimeFormat, dst)
+		if err != nil {
+			return nil, err
+		}
+		return dst, nil
 	default:
 		return nil, ErrUnsupportedTypeForCriterion
 	}
@@ -70,34 +89,72 @@ func (c *Criterion) setLimit(limit interface{}) error {
 	if limit == nil {
 		return nil
 	}
-	var rawLimit json.RawMessage
-	switch c.typeName {
-	case avro.TypeFloat32, avro.TypeFloat64:
-		rawLimit = json.RawMessage(strconv.FormatFloat(limit.(float64), 'f', -1, 64))
-		break
-	case avro.TypeInt32, avro.TypeInt64:
-		rawLimit = json.RawMessage(strconv.FormatInt(limit.(int64), 10))
-		break
-	case avro.TypeString:
-		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit.(string)))
-		break
-	case avro.Type(avro.LogicalTypeTimestamp):
-		t := time.Date(0, 0, 0, 0, 0, limit.(int), 0, time.UTC)
-		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
-		break
-	case avro.Type(avro.LogicalTypeDate):
-		t := time.Date(0, 0, 0, 0, 0, limit.(int), 0, time.UTC)
-		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(SQLDateFormat)))
-		break
-	case avro.Type(avro.LogicalTypeTime):
-		t := limit.(time.Time)
-		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
-		break
-	default:
-		return ErrUnsupportedTypeForCriterion
+	var (
+		schema avro.Schema
+		err    error
+	)
+	if c.fieldSchema.Type.TypeName() == avro.TypeUnion {
+		schema, err = underlyingType(c.fieldSchema.Type.(avro.UnionSchema))
+		if err != nil {
+			return err
+		}
+		var (
+			typeName      = schema.TypeName()
+			primitiveType string
+		)
+		switch typeName {
+		case avro.Type(avro.LogicalTypeTimestamp), avro.Type(avro.LogicalTypeTime):
+			primitiveType = string(avro.TypeInt32)
+			break
+		case avro.Type(avro.LogicalTypeDate):
+			primitiveType = "int.date"
+			break
+		case avro.Type(avro.LogicalTypeDecimal):
+			primitiveType = "bytes.decimal"
+			break
+		default:
+			primitiveType = string(typeName)
+			break
+		}
+		limit = limit.(map[string]interface{})[primitiveType]
+	} else {
+		schema = c.fieldSchema.Type
+	}
+	rawLimit, err := extractRawLimit(schema.TypeName(), limit)
+	if err != nil {
+		return err
 	}
 	c.RawLimit = &rawLimit
 	return nil
+}
+
+func extractRawLimit(typeName avro.Type, limit interface{}) (json.RawMessage, error) {
+	var rawLimit json.RawMessage
+	switch typeName {
+	case avro.TypeFloat32, avro.TypeFloat64:
+		rawLimit = json.RawMessage(strconv.FormatFloat(limit.(float64), 'f', -1, 64))
+		return rawLimit, nil
+	case avro.TypeInt32, avro.TypeInt64:
+		rawLimit = json.RawMessage(strconv.FormatInt(limit.(int64), 10))
+		return rawLimit, nil
+	case avro.TypeString:
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit.(string)))
+		return rawLimit, nil
+	case avro.Type(avro.LogicalTypeTimestamp):
+		t := time.Date(0, 0, 0, 0, 0, int(limit.(int32)), 0, time.UTC)
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+		return rawLimit, nil
+	case avro.Type(avro.LogicalTypeDate):
+		t := limit.(time.Time)
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(SQLDateFormat)))
+		return rawLimit, nil
+	case avro.Type(avro.LogicalTypeTime):
+		t := time.Date(0, 0, 0, 0, 0, int(limit.(int32)), 0, time.UTC)
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+		return rawLimit, nil
+	default:
+		return nil, ErrUnsupportedTypeForCriterion
+	}
 }
 
 // OrderOperand -

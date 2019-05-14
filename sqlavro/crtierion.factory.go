@@ -19,11 +19,8 @@ func NewCriterion(field *avro.RecordFieldSchema, value interface{}, order avro.O
 	} else {
 		criterion.FieldName = field.Name
 	}
-	err := ensureCriterionType(field, &criterion)
-	if err != nil {
-		return nil, err
-	}
-	err = criterion.setLimit(value)
+	criterion.setSchema(*field)
+	err := criterion.setLimit(value)
 	if err != nil {
 		return nil, err
 	}
@@ -39,9 +36,13 @@ func NewCriterionFloat64(fieldName string, limit *float64, order avro.Order) *Cr
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		typeName:  avro.TypeFloat64,
-		RawLimit:  limitBytes,
-		Order:     order,
+		fieldSchema: &avro.RecordFieldSchema{
+			Name:  fieldName,
+			Type:  avro.TypeFloat64,
+			Order: order,
+		},
+		RawLimit: limitBytes,
+		Order:    order,
 	}
 }
 
@@ -54,9 +55,13 @@ func NewCriterionInt64(fieldName string, limit *int64, order avro.Order) *Criter
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		typeName:  avro.TypeInt64,
-		RawLimit:  limitBytes,
-		Order:     order,
+		fieldSchema: &avro.RecordFieldSchema{
+			Name:  fieldName,
+			Type:  avro.TypeInt64,
+			Order: order,
+		},
+		RawLimit: limitBytes,
+		Order:    order,
 	}
 }
 
@@ -69,9 +74,13 @@ func NewCriterionString(fieldName string, limit *string, order avro.Order) *Crit
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		typeName:  avro.TypeString,
-		RawLimit:  limitBytes,
-		Order:     order,
+		fieldSchema: &avro.RecordFieldSchema{
+			Name:  fieldName,
+			Type:  avro.TypeString,
+			Order: order,
+		},
+		RawLimit: limitBytes,
+		Order:    order,
 	}
 }
 
@@ -84,9 +93,17 @@ func NewCriterionDateTime(fieldName string, limit *time.Time, order avro.Order) 
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		typeName:  avro.Type(avro.LogicalTypeTimestamp),
-		RawLimit:  limitBytes,
-		Order:     order,
+		fieldSchema: &avro.RecordFieldSchema{
+			Name: fieldName,
+			Type: &avro.DerivedPrimitiveSchema{
+				Documentation: "datetime",
+				LogicalType:   avro.LogicalTypeTimestamp,
+				Type:          avro.TypeInt32,
+			},
+			Order: order,
+		},
+		RawLimit: limitBytes,
+		Order:    order,
 	}
 }
 
@@ -99,9 +116,17 @@ func NewCriterionDate(fieldName string, limit *time.Time, order avro.Order) *Cri
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		typeName:  avro.Type(avro.LogicalTypeDate),
-		RawLimit:  limitBytes,
-		Order:     order,
+		fieldSchema: &avro.RecordFieldSchema{
+			Name: fieldName,
+			Type: &avro.DerivedPrimitiveSchema{
+				Documentation: "datetime",
+				LogicalType:   avro.LogicalTypeDate,
+				Type:          avro.TypeInt32,
+			},
+			Order: order,
+		},
+		RawLimit: limitBytes,
+		Order:    order,
 	}
 }
 
@@ -114,8 +139,16 @@ func NewCriterionTime(fieldName string, limit *time.Time, order avro.Order) *Cri
 	}
 	return &Criterion{
 		FieldName: fieldName,
-		typeName:  avro.Type(avro.LogicalTypeTime),
-		RawLimit:  limitBytes,
-		Order:     order,
+		fieldSchema: &avro.RecordFieldSchema{
+			Name: fieldName,
+			Type: &avro.DerivedPrimitiveSchema{
+				Documentation: "datetime",
+				LogicalType:   avro.LogicalTypeTime,
+				Type:          avro.TypeInt32,
+			},
+			Order: order,
+		},
+		RawLimit: limitBytes,
+		Order:    order,
 	}
 }

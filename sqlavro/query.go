@@ -170,6 +170,9 @@ func updateCriteria(schema *avro.RecordSchema, record map[string]interface{}, cr
 	newCriteria = make([]Criterion, 0, len(criteria))
 	var newCrit *Criterion
 	for _, criterion := range criteria {
+		if criterion.RawLimit == nil {
+			continue
+		}
 		for _, field := range schema.Fields {
 			if criterion.FieldName == field.Name ||
 				(len(field.Aliases) > 0 && criterion.FieldName == field.Aliases[0]) {
