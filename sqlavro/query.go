@@ -24,23 +24,23 @@ func Query(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, crit
 	} else {
 		newCriteria = criteria
 	}
-	resultSchema := avro.ArraySchema{
-		Type:  avro.TypeArray,
-		Items: schema,
-	}
-	resultSchemaBytes, err := json.Marshal(resultSchema)
+	SchemaBytes, err := json.Marshal(schema)
 	if err != nil {
 		return nil, nil, err
 	}
-	codec, err := goavro.NewCodec(string(resultSchemaBytes))
+	avroBuf := new(bytes.Buffer)
+	fileWriter, err := goavro.NewOCFWriter(goavro.OCFConfig{
+		W:      avroBuf,
+		Schema: string(SchemaBytes),
+	})
 	if err != nil {
 		return nil, nil, err
 	}
-	avroBytes, err = codec.BinaryFromNative(nil, records)
+	err = fileWriter.Append(records)
 	if err != nil {
 		return nil, nil, err
 	}
-	return avroBytes, newCriteria, nil
+	return avroBuf.Bytes(), newCriteria, nil
 }
 
 func query2Native(db *sql.DB, dbName string, schema *avro.RecordSchema, limit int, criteria []Criterion) ([]map[string]interface{}, error) {
