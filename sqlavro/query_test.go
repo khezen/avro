@@ -154,19 +154,19 @@ func TestQuery(t *testing.T) {
 		Schema: &schemas[0],
 		Limit:  10,
 		Criteria: []Criterion{
-			Criterion{
+			{
 				FieldName: "post_date",
 				RawLimit:  &dateStr,
 			},
-			Criterion{
+			{
 				FieldName: "post_datetime",
 				RawLimit:  &dateTimeStr,
 			},
-			Criterion{
+			{
 				FieldName: "update_timestamp",
 				RawLimit:  &timeStampStr,
 			},
-			Criterion{
+			{
 				FieldName: "update_time",
 				RawLimit:  nil,
 			},
