@@ -289,17 +289,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	avroBytes, updatedCriteria, err := sqlavro.Query(
-		sqlavro.QueryConfig{
-			DB:     db,
-			DBName: "blog",
-			Schema: schema,
-			Limit:  limit,
-			Criteria: []sqlavro.Criterion{
-				*sqlavro.NewCriterionDateTime("post_date", &from, order),
-			},
+	avroBytes, updatedCriteria, err := sqlavro.Query(sqlavro.QueryConfig{
+		DB:     db,
+		DBName: "blog",
+		Schema: schema,
+		Limit:  limit,
+		Criteria: []sqlavro.Criterion{
+			*sqlavro.NewCriterionDateTime("post_date", &from, order),
 		},
-	)
+	})
 	if err != nil {
 		panic(err)
 	}
