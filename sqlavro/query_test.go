@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"testing"
 
@@ -170,27 +169,36 @@ func TestQuery(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	resultSchema := avro.ArraySchema{
-		Type:  avro.TypeArray,
-		Items: &schemas[0],
-	}
-	resultSchemaBytes, err := json.Marshal(resultSchema)
+	buf := bytes.NewBuffer(avroBytes)
+	fileReader, err := goavro.NewOCFReader(buf)
 	if err != nil {
 		panic(err)
 	}
-	codec, err := goavro.NewCodec(string(resultSchemaBytes))
+	// Convert binary Avro data back to native Go form
+	native := make([]interface{}, 0, 10)
+	for fileReader.Scan() {
+		datum, err := fileReader.Read()
+		if err != nil {
+			panic(err)
+		}
+		native = append(native, datum)
+	}
+	collectionSchema := avro.ArraySchema{
+		Type:  avro.TypeArray,
+		Items: &schemas[0],
+	}
+	collectionSchemaBytes, err := json.Marshal(collectionSchema)
+	if err != nil {
+		panic(err)
+	}
+	codec, err := goavro.NewCodec(string(collectionSchemaBytes))
 	if err != nil {
 		t.Error(err)
-	}
-	// Convert binary Avro data back to native Go form
-	native, _, err := codec.NativeFromBinary(avroBytes)
-	if err != nil {
-		fmt.Println(err)
 	}
 	// Convert native Go form to textual Avro data
 	textual, err := codec.TextualFromNative(nil, native)
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 	expetedTextual := `[{"post_datetime":1239321600,"update_timestamp":{"int":1254614400},"title":"lorem ipsum","update_time":{"int":2764800},"post_timestamp":1254614400,"update_date":{"int.date":14344},"some_nullable_float32":{"float":42.42},"some_nullable_float64":{"double":4242.4242},"post_date":14344,"author":{"string":"John Doe"},"body":"lorem ipsum etc...","reading_time_minutes":{"bytes.decimal":"\u0014"},"some_float64":4242.4242,"ID":42,"some_int64":4242,"some_nullable_int64":{"long":4242},"content_type":null,"some_nullable_int32":{"int":42},"daily_average_traffic":"u4","some_float32":42.42,"some_nullable_blob":{"bytes":"lorem ipsum dolor etc..."},"update_datetime":{"int":1239321600},"post_time":2764800}]`
 	if !JSONArraysEquals([]byte(expetedTextual), textual) {
