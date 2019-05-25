@@ -148,32 +148,30 @@ func TestQuery(t *testing.T) {
 	dateStr := json.RawMessage(`"1970-01-01"`)
 	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
 	timeStampStr := json.RawMessage(strconv.FormatInt(0, 10))
-	avroBytes, _, err := Query(
-		QueryConfig{
-			DB:     db,
-			DBName: "blog",
-			Schema: &schemas[0],
-			Limit:  10,
-			Criteria: []Criterion{
-				Criterion{
-					FieldName: "post_date",
-					RawLimit:  &dateStr,
-				},
-				Criterion{
-					FieldName: "post_datetime",
-					RawLimit:  &dateTimeStr,
-				},
-				Criterion{
-					FieldName: "update_timestamp",
-					RawLimit:  &timeStampStr,
-				},
-				Criterion{
-					FieldName: "update_time",
-					RawLimit:  nil,
-				},
+	avroBytes, _, err := Query(QueryConfig{
+		DB:     db,
+		DBName: "blog",
+		Schema: &schemas[0],
+		Limit:  10,
+		Criteria: []Criterion{
+			Criterion{
+				FieldName: "post_date",
+				RawLimit:  &dateStr,
+			},
+			Criterion{
+				FieldName: "post_datetime",
+				RawLimit:  &dateTimeStr,
+			},
+			Criterion{
+				FieldName: "update_timestamp",
+				RawLimit:  &timeStampStr,
+			},
+			Criterion{
+				FieldName: "update_time",
+				RawLimit:  nil,
 			},
 		},
-	)
+	})
 	if err != nil {
 		t.Error(err)
 	}
