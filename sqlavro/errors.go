@@ -13,4 +13,10 @@ var (
 	ErrCannotIgnoreOrder = errors.New("ErrCannotIgnoreOrder")
 	// ErrUnsupportedTypeForSQL -
 	ErrUnsupportedTypeForSQL = errors.New("ErrUnsupportedTypeForSQL")
+	// ErrQueryConfigMissingDB -
+	ErrQueryConfigMissingDB = errors.New("ErrQueryConfigMissingDB")
+	// ErrQueryConfigMissingDBName -
+	ErrQueryConfigMissingDBName = errors.New("ErrQueryConfigMissingDBName")
+	// ErrQueryConfigMissingSchema -
+	ErrQueryConfigMissingSchema = errors.New("ErrQueryConfigMissingSchema")
 )
