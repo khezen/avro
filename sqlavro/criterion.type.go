@@ -13,7 +13,7 @@ func ensureCriterionTypes(schema *avro.RecordSchema, criteria []Criterion) (err 
 	for i = range criteria {
 		match = false
 		for _, field = range schema.Fields {
-			match = criteria[i].FieldName == field.Name || (len(field.Aliases) > 0 && field.Aliases[0] == field.Name)
+			match = criteria[i].FieldName == field.Name || (len(field.Aliases) > 0 && field.Aliases[0] == criteria[i].FieldName)
 			if match {
 				criteria[i].setSchema(field)
 				break
