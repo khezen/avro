@@ -18,7 +18,7 @@ func sqlRow2native(schema *avro.RecordSchema, sqlFields []interface{}) (map[stri
 
 func sqlField2native(schema avro.Schema, sqlField interface{}) (interface{}, error) {
 	if schema.TypeName() == avro.TypeUnion {
-		return renderNativeFieldNullable(schema, sqlField)
+		return sql2NativeFieldNullable(schema, sqlField)
 	}
-	return renderNativeFieldNotNull(schema, sqlField)
+	return sql2NativeFieldNotNull(schema, sqlField)
 }
