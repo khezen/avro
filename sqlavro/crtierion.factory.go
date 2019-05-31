@@ -9,8 +9,8 @@ import (
 	"github.com/khezen/avro"
 )
 
-// NewCriterion -
-func NewCriterion(field *avro.RecordFieldSchema, value interface{}, order avro.Order) (*Criterion, error) {
+// NewCriterionFromNative -
+func NewCriterionFromNative(field *avro.RecordFieldSchema, value interface{}, order avro.Order) (*Criterion, error) {
 	criterion := Criterion{
 		Order: order,
 	}
@@ -20,7 +20,25 @@ func NewCriterion(field *avro.RecordFieldSchema, value interface{}, order avro.O
 		criterion.FieldName = field.Name
 	}
 	criterion.setSchema(*field)
-	err := criterion.setLimit(value)
+	err := criterion.setLimitFromNative(value)
+	if err != nil {
+		return nil, err
+	}
+	return &criterion, nil
+}
+
+// NewCriterionFromString -
+func NewCriterionFromString(field *avro.RecordFieldSchema, value string, order avro.Order) (*Criterion, error) {
+	criterion := Criterion{
+		Order: order,
+	}
+	if len(field.Aliases) > 0 {
+		criterion.FieldName = field.Aliases[0]
+	} else {
+		criterion.FieldName = field.Name
+	}
+	criterion.setSchema(*field)
+	err := criterion.setLimitFromString(value)
 	if err != nil {
 		return nil, err
 	}

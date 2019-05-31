@@ -76,7 +76,7 @@ func criteriaFromString(schema *avro.RecordSchema, record map[string]string, cri
 		for _, field := range schema.Fields {
 			if criterion.FieldName == field.Name ||
 				(len(field.Aliases) > 0 && criterion.FieldName == field.Aliases[0]) {
-				newCrit, err = NewCriterion(&field, record[criterion.FieldName], criterion.Order)
+				newCrit, err = NewCriterionFromString(&field, record[criterion.FieldName], criterion.Order)
 				if err != nil {
 					return nil, err
 				}

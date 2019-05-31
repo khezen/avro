@@ -85,7 +85,7 @@ func (c *Criterion) limit(schema avro.Schema) (interface{}, error) {
 	}
 }
 
-func (c *Criterion) setLimit(limit interface{}) error {
+func (c *Criterion) setLimitFromNative(limit interface{}) error {
 	if limit == nil {
 		return nil
 	}
@@ -117,10 +117,8 @@ func (c *Criterion) setLimit(limit interface{}) error {
 			break
 		}
 		limit = limit.(map[string]interface{})[primitiveType]
-	} else {
-		schema = c.fieldSchema.Type
 	}
-	rawLimit, err := extractRawLimit(schema.TypeName(), limit)
+	rawLimit, err := rawLimit2Native(schema.TypeName(), limit)
 	if err != nil {
 		return err
 	}
@@ -128,7 +126,66 @@ func (c *Criterion) setLimit(limit interface{}) error {
 	return nil
 }
 
-func extractRawLimit(typeName avro.Type, limit interface{}) (json.RawMessage, error) {
+func (c *Criterion) setLimitFromString(limit string) error {
+	if limit == "" {
+		return nil
+	}
+	var (
+		schema avro.Schema
+		err    error
+	)
+	if c.fieldSchema.Type.TypeName() == avro.TypeUnion {
+		schema, err = underlyingType(c.fieldSchema.Type.(avro.UnionSchema))
+		if err != nil {
+			return err
+		}
+	}
+	rawLimit, err := rawLimit2String(schema.TypeName(), c.fieldSchema.Documentation, limit)
+	if err != nil {
+		return err
+	}
+	c.RawLimit = &rawLimit
+	return nil
+}
+
+func rawLimit2String(typeName avro.Type, documentation string, limit string) (json.RawMessage, error) {
+	var rawLimit json.RawMessage
+	switch typeName {
+	case avro.TypeFloat32, avro.TypeFloat64,
+		avro.TypeInt32, avro.TypeInt64:
+		rawLimit = json.RawMessage(limit)
+		return rawLimit, nil
+	case avro.TypeString,
+		avro.Type(avro.LogicalTypeDate),
+		avro.Type(avro.LogicalTypeTime):
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit))
+		return rawLimit, nil
+	case avro.Type(avro.LogicalTypeTimestamp):
+		switch documentation {
+		case string(DateTime):
+			t, err := time.Parse(SQLDateTimeFormat, limit)
+			if err != nil {
+				return nil, err
+			}
+			rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+			return rawLimit, nil
+		case string(Timestamp):
+			timestamp, err := strconv.ParseInt(limit, 10, 32)
+			if err != nil {
+				return nil, err
+			}
+			t := time.Date(1970, 1, 1, 0, 0, int(timestamp), 0, time.UTC)
+			rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+			return rawLimit, nil
+		default:
+			return nil, ErrUnsupportedTypeForCriterion
+		}
+	default:
+		return nil, ErrUnsupportedTypeForCriterion
+	}
+}
+
+func rawLimit2Native(typeName avro.Type, limit interface{}) (json.RawMessage, error) {
 	var rawLimit json.RawMessage
 	switch typeName {
 	case avro.TypeFloat32, avro.TypeFloat64:

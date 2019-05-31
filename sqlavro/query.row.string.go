@@ -16,7 +16,7 @@ func sqlRow2String(schema *avro.RecordSchema, sqlFields []interface{}) (map[stri
 
 func sqlField2String(schema avro.Schema, sqlField interface{}) (string, error) {
 	if schema.TypeName() == avro.TypeUnion {
-		return sql2CSVFieldNullable(schema, sqlField)
+		return sql2StringFieldNullable(schema, sqlField)
 	}
-	return sql2CSVFieldNotNull(schema, sqlField)
+	return sql2StringFieldNotNull(schema, sqlField)
 }
