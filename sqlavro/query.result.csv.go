@@ -1,11 +1,7 @@
 package sqlavro
 
 import (
-	"bytes"
-	"encoding/json"
-
 	"github.com/khezen/avro"
-	"github.com/linkedin/goavro"
 )
 
 func query2CSV(cfg QueryConfig) (csvBytes []byte, newCriteria []Criterion, err error) {
@@ -33,10 +29,10 @@ func query2CSV(cfg QueryConfig) (csvBytes []byte, newCriteria []Criterion, err e
 		}
 		records = append(records, record)
 	}
-	return native2CSV(cfg, records)
+	return strings2CSV(cfg, records)
 }
 
-func native2CSV(cfg QueryConfig, records []map[string]string) (avroBytes []byte, newCriteria []Criterion, err error) {
+func strings2CSV(cfg QueryConfig, records []map[string]string) (avroBytes []byte, newCriteria []Criterion, err error) {
 	recordsLen := len(records)
 	if recordsLen > 0 && cfg.Criteria != nil {
 		newCriteria, err = criteriaFromString(cfg.Schema, records[recordsLen-1], cfg.Criteria)
@@ -46,24 +42,7 @@ func native2CSV(cfg QueryConfig, records []map[string]string) (avroBytes []byte,
 	} else {
 		newCriteria = cfg.Criteria
 	}
-	SchemaBytes, err := json.Marshal(cfg.Schema)
-	if err != nil {
-		return nil, nil, err
-	}
-	avroBuf := new(bytes.Buffer)
-	fileWriter, err := goavro.NewOCFWriter(goavro.OCFConfig{
-		W:               avroBuf,
-		Schema:          string(SchemaBytes),
-		CompressionName: cfg.Compression,
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-	err = fileWriter.Append(records)
-	if err != nil {
-		return nil, nil, err
-	}
-	return avroBuf.Bytes(), newCriteria, nil
+	// create file
 }
 
 func criteriaFromString(schema *avro.RecordSchema, record map[string]string, criteria []Criterion) (newCriteria []Criterion, err error) {

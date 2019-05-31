@@ -19,4 +19,6 @@ var (
 	ErrQueryConfigMissingDBName = errors.New("ErrQueryConfigMissingDBName")
 	// ErrQueryConfigMissingSchema -
 	ErrQueryConfigMissingSchema = errors.New("ErrQueryConfigMissingSchema")
+	// ErrUnsupportedOutput - query doesn't supprot this ouput
+	ErrUnsupportedOutput = errors.New("ErrUnsupportedOutput")
 )

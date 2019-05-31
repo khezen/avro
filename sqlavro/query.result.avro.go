@@ -8,7 +8,7 @@ import (
 	"github.com/linkedin/goavro"
 )
 
-func query2Avro(cfg QueryConfig) (avroBytes []byte, newCriteria []Criterion, err error) {
+func query2AVRO(cfg QueryConfig) (avroBytes []byte, newCriteria []Criterion, err error) {
 	statement, params, err := renderQuery(cfg.DBName, cfg.Schema, cfg.Limit, cfg.Criteria)
 	if err != nil {
 		return nil, nil, err

@@ -11,12 +11,9 @@ import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/khezen/avro"
 	"github.com/linkedin/goavro"
-	"github.com/valyala/fastjson"
 )
 
-var unmarshaller fastjson.Parser
-
-func TestQuery(t *testing.T) {
+func TestQuery2CSV(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -211,46 +208,4 @@ func TestQuery(t *testing.T) {
 		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expetedTextual), string(textual))
 	}
 
-}
-
-func JSONArraysEquals(expected, given []byte) bool {
-	var expectedArray []map[string]json.RawMessage
-	err := json.Unmarshal(expected, &expectedArray)
-	if err != nil {
-		panic(err)
-	}
-	var givenArray []map[string]json.RawMessage
-	err = json.Unmarshal(given, &givenArray)
-	if err != nil {
-		panic(err)
-	}
-	if len(givenArray) != len(expectedArray) {
-		return false
-	}
-	for i := range expectedArray {
-		if !JSONObjectEquals(expectedArray[i], givenArray[i]) {
-			return false
-		}
-	}
-	return true
-}
-
-func JSONObjectEquals(expectedObject, givenObject map[string]json.RawMessage) bool {
-	for key := range expectedObject {
-		if _, ok := givenObject[key]; !ok {
-			return false
-		}
-		if !bytes.EqualFold(expectedObject[key], givenObject[key]) {
-			return false
-		}
-	}
-	for key := range givenObject {
-		if _, ok := expectedObject[key]; !ok {
-			return false
-		}
-		if !bytes.EqualFold(expectedObject[key], givenObject[key]) {
-			return false
-		}
-	}
-	return true
 }
