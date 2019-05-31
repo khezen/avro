@@ -1,9 +1,7 @@
 package sqlavro
 
 import (
-	"fmt"
-	"math/big"
-	"time"
+	"strconv"
 
 	"github.com/khezen/avro"
 )
@@ -11,9 +9,9 @@ import (
 func sql2CSVFieldNotNull(schema avro.Schema, sqlField interface{}) (string, error) {
 	switch schema.TypeName() {
 	case avro.TypeInt64:
-		return *sqlField.(*int64), nil
+		return strconv.FormatInt(*sqlField.(*int64), 64), nil
 	case avro.TypeInt32:
-		return *sqlField.(*int32), nil
+		return strconv.FormatInt(int64(*sqlField.(*int32)), 32), nil
 	case avro.Type(avro.LogicalTypeDate):
 		return sql2CSVDate(sqlField)
 	case avro.Type(avro.LogicalTypeTime):
@@ -21,60 +19,39 @@ func sql2CSVFieldNotNull(schema avro.Schema, sqlField interface{}) (string, erro
 	case avro.Type(avro.LogicalTypeTimestamp):
 		return sql2CSVTimestamp(schema, sqlField)
 	case avro.TypeFloat64:
-		return *sqlField.(*float64), nil
+		return strconv.FormatFloat(*sqlField.(*float64), 'f', -1, 64), nil
 	case avro.TypeFloat32:
-		return *sqlField.(*float32), nil
+		return strconv.FormatFloat(float64(*sqlField.(*float32)), 'f', -1, 64), nil
 	case avro.TypeString:
 		return *sqlField.(*string), nil
 	case avro.TypeBytes, avro.TypeFixed:
-		return *sqlField.(*[]byte), nil
+		return string(*sqlField.(*[]byte)), nil
 	case avro.Type(avro.LogicalTypeDecimal):
 		return sql2CSVDecimal(sqlField)
 	}
-	return nil, ErrUnsupportedTypeForSQL
+	return "", ErrUnsupportedTypeForSQL
 }
 
 func sql2CSVTimestamp(schema avro.Schema, sqlField interface{}) (string, error) {
 	switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
 	case string(DateTime):
-		timeStr := *sqlField.(*string)
-		t, err := time.Parse(SQLDateTimeFormat, timeStr)
-		if err != nil {
-			return "", err
-		}
-		return int32(t.Unix()), nil
+		return *sqlField.(*string), nil
 	case "", string(Timestamp):
-		return *sqlField.(*int32), nil
+		return strconv.FormatInt(int64(*sqlField.(*int32)), 32), nil
 	default:
-		return nil, ErrUnsupportedTypeForSQL
+		return "", ErrUnsupportedTypeForSQL
 	}
 }
 
-func sql2CSVTime(sqlField interface{}) (interface{}, error) {
-	timeStr := *sqlField.(*string)
-	t, err := time.Parse(SQLTimeFormat, timeStr)
-	if err != nil {
-		return nil, err
-	}
-	t = t.AddDate(1970, 1, 1)
-	return int32(t.Unix()), nil
+func sql2CSVTime(sqlField interface{}) (string, error) {
+	return *sqlField.(*string), nil
 }
 
-func sql2CSVDate(sqlField interface{}) (interface{}, error) {
-	timeStr := *sqlField.(*string)
-	t, err := time.Parse(SQLDateFormat, timeStr)
-	if err != nil {
-		return nil, err
-	}
-	return t, nil
+func sql2CSVDate(sqlField interface{}) (string, error) {
+	return *sqlField.(*string), nil
 }
 
-func sql2CSVDecimal(sqlField interface{}) (interface{}, error) {
+func sql2CSVDecimal(sqlField interface{}) (string, error) {
 	field := *sqlField.(*[]byte)
-	r := new(big.Rat)
-	_, err := fmt.Sscan(string(field), r)
-	if err != nil {
-		return nil, err
-	}
-	return r, nil
+	return string(field), nil
 }
