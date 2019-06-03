@@ -40,12 +40,12 @@ func sql2StringFieldNullable(schema avro.Schema, sqlField interface{}) (string, 
 
 func sql2StringInt64Nullable(sqlField interface{}) string {
 	nullableField := sqlField.(*sql.NullInt64)
-	return strconv.FormatInt(nullableField.Int64, 64)
+	return strconv.FormatInt(nullableField.Int64, 10)
 }
 
 func sql2StringInt32Nullable(sqlField interface{}) string {
 	nullableField := sqlField.(*sql.NullInt64)
-	return strconv.FormatInt(nullableField.Int64, 32)
+	return strconv.FormatInt(nullableField.Int64, 10)
 }
 
 func sql2StringFloat64Nullable(sqlField interface{}) string {
@@ -85,7 +85,7 @@ func sql2StringTimestampNullable(schema avro.Schema, sqlField interface{}) (stri
 		return nullableField.String, nil
 	case "", string(Timestamp):
 		nullableField := sqlField.(*sql.NullInt64)
-		return strconv.FormatInt(nullableField.Int64, 64), nil
+		return strconv.FormatInt(nullableField.Int64, 10), nil
 	default:
 		return "", ErrUnsupportedTypeForSQL
 	}

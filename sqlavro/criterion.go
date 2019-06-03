@@ -11,11 +11,10 @@ import (
 
 // Criterion -
 type Criterion struct {
-	FieldName     string `json:"field"`
-	fieldSchema   *avro.RecordFieldSchema
-	documentation string
-	RawLimit      *json.RawMessage `json:"limit,omitempty"`
-	Order         avro.Order       `json:"order,omitempty"` // default: Ascending
+	FieldName   string `json:"field"`
+	fieldSchema *avro.RecordFieldSchema
+	RawLimit    *json.RawMessage `json:"limit,omitempty"`
+	Order       avro.Order       `json:"order,omitempty"` // default: Ascending
 }
 
 func (c *Criterion) setSchema(field avro.RecordFieldSchema) {
@@ -36,7 +35,6 @@ func (c *Criterion) Limit() (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-
 	} else {
 		schema = c.fieldSchema.Type
 	}
@@ -117,8 +115,10 @@ func (c *Criterion) setLimitFromNative(limit interface{}) error {
 			break
 		}
 		limit = limit.(map[string]interface{})[primitiveType]
+	} else {
+		schema = c.fieldSchema.Type
 	}
-	rawLimit, err := rawLimit2Native(schema.TypeName(), limit)
+	rawLimit, err := rawLimit2Native(schema, limit)
 	if err != nil {
 		return err
 	}
@@ -139,8 +139,10 @@ func (c *Criterion) setLimitFromString(limit string) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		schema = c.fieldSchema.Type
 	}
-	rawLimit, err := rawLimit2String(schema.TypeName(), c.fieldSchema.Documentation, limit)
+	rawLimit, err := rawLimit2String(schema, limit)
 	if err != nil {
 		return err
 	}
@@ -148,8 +150,11 @@ func (c *Criterion) setLimitFromString(limit string) error {
 	return nil
 }
 
-func rawLimit2String(typeName avro.Type, documentation string, limit string) (json.RawMessage, error) {
-	var rawLimit json.RawMessage
+func rawLimit2String(schema avro.Schema, limit string) (json.RawMessage, error) {
+	var (
+		rawLimit json.RawMessage
+		typeName = schema.TypeName()
+	)
 	switch typeName {
 	case avro.TypeFloat32, avro.TypeFloat64,
 		avro.TypeInt32, avro.TypeInt64:
@@ -161,7 +166,8 @@ func rawLimit2String(typeName avro.Type, documentation string, limit string) (js
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit))
 		return rawLimit, nil
 	case avro.Type(avro.LogicalTypeTimestamp):
-		switch documentation {
+		derivateSchema := schema.(*avro.DerivedPrimitiveSchema)
+		switch derivateSchema.Documentation {
 		case string(DateTime):
 			t, err := time.Parse(SQLDateTimeFormat, limit)
 			if err != nil {
@@ -185,8 +191,11 @@ func rawLimit2String(typeName avro.Type, documentation string, limit string) (js
 	}
 }
 
-func rawLimit2Native(typeName avro.Type, limit interface{}) (json.RawMessage, error) {
-	var rawLimit json.RawMessage
+func rawLimit2Native(schema avro.Schema, limit interface{}) (json.RawMessage, error) {
+	var (
+		rawLimit json.RawMessage
+		typeName = schema.TypeName()
+	)
 	switch typeName {
 	case avro.TypeFloat32, avro.TypeFloat64:
 		rawLimit = json.RawMessage(strconv.FormatFloat(limit.(float64), 'f', -1, 64))

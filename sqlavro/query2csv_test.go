@@ -9,8 +9,6 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
-	"github.com/khezen/avro"
-	"github.com/linkedin/goavro"
 )
 
 func TestQuery2CSV(t *testing.T) {
@@ -145,7 +143,7 @@ func TestQuery2CSV(t *testing.T) {
 	dateStr := json.RawMessage(`"1970-01-01"`)
 	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
 	timeStampStr := json.RawMessage(strconv.FormatInt(0, 10))
-	avroBytes, _, err := Query(QueryConfig{
+	csvBytes, _, err := Query(QueryConfig{
 		DB:     db,
 		DBName: "blog",
 		Schema: &schemas[0],
@@ -168,44 +166,14 @@ func TestQuery2CSV(t *testing.T) {
 				RawLimit:  nil,
 			},
 		},
+		Output: outputCSV,
 	})
 	if err != nil {
 		t.Error(err)
 	}
-	buf := bytes.NewBuffer(avroBytes)
-	fileReader, err := goavro.NewOCFReader(buf)
-	if err != nil {
-		panic(err)
+	expectedCSV := []byte(`ID,title,body,content_type,author,post_datetime,update_datetime,reading_time_minutes,daily_average_traffic,post_date,post_time,post_timestamp,some_int64,some_float64,some_float32,update_date,update_time,update_timestamp,some_nullable_int32,some_nullable_int64,some_nullable_float64,some_nullable_float32,some_nullable_blob
+	42,lorem ipsum,lorem ipsum etc...,,John Doe,2009-04-10 00:00:00,2009-04-10 00:00:00,2.0,3000.46,2009-04-10,00:00:00,15cfpc0,4242,4242.4242,42.41999816894531,2009-04-10,00:00:00,1254614400,42,4242,4242.4242,42.42,lorem ipsum dolor etc...`)
+	if bytes.EqualFold(csvBytes, expectedCSV) {
+		t.Errorf("expected:\n%s\n\ngot:%s\n\n", string(expectedCSV), string(csvBytes))
 	}
-	// Convert binary Avro data back to native Go form
-	native := make([]interface{}, 0, 10)
-	for fileReader.Scan() {
-		datum, err := fileReader.Read()
-		if err != nil {
-			panic(err)
-		}
-		native = append(native, datum)
-	}
-	collectionSchema := avro.ArraySchema{
-		Type:  avro.TypeArray,
-		Items: &schemas[0],
-	}
-	collectionSchemaBytes, err := json.Marshal(collectionSchema)
-	if err != nil {
-		panic(err)
-	}
-	codec, err := goavro.NewCodec(string(collectionSchemaBytes))
-	if err != nil {
-		t.Error(err)
-	}
-	// Convert native Go form to textual Avro data
-	textual, err := codec.TextualFromNative(nil, native)
-	if err != nil {
-		panic(err)
-	}
-	expetedTextual := `[{"post_datetime":1239321600,"update_timestamp":{"int":1254614400},"title":"lorem ipsum","update_time":{"int":2764800},"post_timestamp":1254614400,"update_date":{"int.date":14344},"some_nullable_float32":{"float":42.42},"some_nullable_float64":{"double":4242.4242},"post_date":14344,"author":{"string":"John Doe"},"body":"lorem ipsum etc...","reading_time_minutes":{"bytes.decimal":"\u0014"},"some_float64":4242.4242,"ID":42,"some_int64":4242,"some_nullable_int64":{"long":4242},"content_type":null,"some_nullable_int32":{"int":42},"daily_average_traffic":"u4","some_float32":42.42,"some_nullable_blob":{"bytes":"lorem ipsum dolor etc..."},"update_datetime":{"int":1239321600},"post_time":2764800}]`
-	if !JSONArraysEquals([]byte(expetedTextual), textual) {
-		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expetedTextual), string(textual))
-	}
-
 }

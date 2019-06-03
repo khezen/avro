@@ -9,9 +9,9 @@ import (
 func sql2StringFieldNotNull(schema avro.Schema, sqlField interface{}) (string, error) {
 	switch schema.TypeName() {
 	case avro.TypeInt64:
-		return strconv.FormatInt(*sqlField.(*int64), 64), nil
+		return strconv.FormatInt(*sqlField.(*int64), 10), nil
 	case avro.TypeInt32:
-		return strconv.FormatInt(int64(*sqlField.(*int32)), 32), nil
+		return strconv.FormatInt(int64(*sqlField.(*int32)), 10), nil
 	case avro.Type(avro.LogicalTypeDate):
 		return sql2StringDate(sqlField)
 	case avro.Type(avro.LogicalTypeTime):

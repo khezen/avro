@@ -58,7 +58,7 @@ func (qc *QueryConfig) Verify() error {
 	if qc.Compression != "" && qc.Compression != avro.CompressionNull && qc.Compression != avro.CompressionDeflate && qc.Compression != avro.CompressionSnappy {
 		return avro.ErrUnsupportedCompression
 	}
-	if qc.Output != "" {
+	if qc.Output == "" {
 		qc.Output = outputAVRO
 	}
 	if qc.Output != "" && qc.Output != outputAVRO && qc.Output != outputCSV {
