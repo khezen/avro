@@ -91,16 +91,15 @@ func NewCodec(schemaSpecification string) (*Codec, error) {
 	st := newSymbolTable()
 
 	c, err := buildCodec(st, nullNamespace, schema)
-	if err == nil {
-		c.schemaOriginal = schemaSpecification
-		c.schemaCanonical, err = parsingCanonicalForm(schema)
-		if err != nil {
-			// Should not get here because schema is already validated above.
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
-
-	return c, err
+	c.schemaCanonical, err = parsingCanonicalForm(schema)
+	if err != nil {
+		return nil, err // should not get here because schema was validated above
+	}
+	c.schemaOriginal = schemaSpecification
+	return c, nil
 }
 
 func newSymbolTable() map[string]*Codec {
@@ -277,8 +276,8 @@ func (c *Codec) BinaryFromNative(buf []byte, datum interface{}) ([]byte, error) 
 
 // NativeFromBinary returns a native datum value from the binary encoded byte
 // slice in accordance with the Avro schema supplied when creating the Codec. On
-// success, it returns the decoded datum, along with a new byte slice with the
-// decoded bytes consumed, and a nil error value. On error, it returns nil for
+// success, it returns the decoded datum, a byte slice containing the remaining
+// undecoded bytes, and a nil error value. On error, it returns nil for
 // the datum value, the original byte slice, and the error message.
 //
 //     func ExampleNativeFromBinary() {

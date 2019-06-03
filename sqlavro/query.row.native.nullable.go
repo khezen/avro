@@ -9,7 +9,7 @@ import (
 	"github.com/khezen/avro"
 )
 
-func renderNativeFieldNullable(schema avro.Schema, sqlField interface{}) (interface{}, error) {
+func sql2NativeFieldNullable(schema avro.Schema, sqlField interface{}) (interface{}, error) {
 	union := schema.(avro.UnionSchema)
 	subSchema, err := underlyingType(union)
 	if err != nil {
@@ -17,30 +17,30 @@ func renderNativeFieldNullable(schema avro.Schema, sqlField interface{}) (interf
 	}
 	switch subSchema.TypeName() {
 	case avro.TypeInt64:
-		return renderNativeInt64Nullable(sqlField)
+		return sql2NativeInt64Nullable(sqlField)
 	case avro.TypeInt32:
-		return renderNativeInt32Nullable(sqlField)
+		return sql2NativeInt32Nullable(sqlField)
 	case avro.Type(avro.LogicalTypeDate):
-		return renderNativeDateNullable(sqlField)
+		return sql2NativeDateNullable(sqlField)
 	case avro.Type(avro.LogicalTypeTime):
-		return renderNativeTimeNullable(sqlField)
+		return sql2NativeTimeNullable(sqlField)
 	case avro.Type(avro.LogicalTypeTimestamp):
-		return renderNativeTimestampNullable(subSchema, sqlField)
+		return sql2NativeTimestampNullable(subSchema, sqlField)
 	case avro.TypeFloat64:
-		return renderNativeFloat64Nullable(sqlField)
+		return sql2NativeFloat64Nullable(sqlField)
 	case avro.TypeFloat32:
-		return renderNativeFloat32Nullable(sqlField)
+		return sql2NativeFloat32Nullable(sqlField)
 	case avro.TypeString:
-		return renderNativeStringNullable(sqlField)
+		return sql2NativeStringNullable(sqlField)
 	case avro.TypeBytes, avro.TypeFixed:
-		return renderNativeBytesNFixedNullable(subSchema, sqlField)
+		return sql2NativeBytesNFixedNullable(subSchema, sqlField)
 	case avro.Type(avro.LogicalTypeDecimal):
-		return renderNativeDecimalNullable(sqlField)
+		return sql2NativeDecimalNullable(sqlField)
 	}
 	return nil, ErrUnsupportedTypeForSQL
 }
 
-func renderNativeInt64Nullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeInt64Nullable(sqlField interface{}) (interface{}, error) {
 	nullableField := sqlField.(*sql.NullInt64)
 	if nullableField.Valid {
 		return map[string]interface{}{string(avro.TypeInt64): nullableField.Int64}, nil
@@ -48,7 +48,7 @@ func renderNativeInt64Nullable(sqlField interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func renderNativeInt32Nullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeInt32Nullable(sqlField interface{}) (interface{}, error) {
 	nullableField := sqlField.(*sql.NullInt64)
 	if nullableField.Valid {
 		return map[string]interface{}{string(avro.TypeInt32): int32(nullableField.Int64)}, nil
@@ -56,7 +56,7 @@ func renderNativeInt32Nullable(sqlField interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func renderNativeFloat64Nullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeFloat64Nullable(sqlField interface{}) (interface{}, error) {
 	nullableField := sqlField.(*sql.NullFloat64)
 	if nullableField.Valid {
 		return map[string]interface{}{string(avro.TypeFloat64): nullableField.Float64}, nil
@@ -64,7 +64,7 @@ func renderNativeFloat64Nullable(sqlField interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func renderNativeFloat32Nullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeFloat32Nullable(sqlField interface{}) (interface{}, error) {
 	nullableField := sqlField.(*sql.NullFloat64)
 	if nullableField.Valid {
 		return map[string]interface{}{string(avro.TypeFloat32): float32(nullableField.Float64)}, nil
@@ -72,7 +72,7 @@ func renderNativeFloat32Nullable(sqlField interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func renderNativeStringNullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeStringNullable(sqlField interface{}) (interface{}, error) {
 	nullableField := sqlField.(*sql.NullString)
 	if nullableField.Valid {
 		return map[string]interface{}{string(avro.TypeString): nullableField.String}, nil
@@ -80,7 +80,7 @@ func renderNativeStringNullable(sqlField interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func renderNativeBytesNFixedNullable(schema avro.Schema, sqlField interface{}) (interface{}, error) {
+func sql2NativeBytesNFixedNullable(schema avro.Schema, sqlField interface{}) (interface{}, error) {
 	field := *sqlField.(*[]byte)
 	if field != nil {
 		return map[string]interface{}{string(schema.TypeName()): field}, nil
@@ -88,7 +88,7 @@ func renderNativeBytesNFixedNullable(schema avro.Schema, sqlField interface{}) (
 	return nil, nil
 }
 
-func renderNativeDateNullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeDateNullable(sqlField interface{}) (interface{}, error) {
 	nullableField := sqlField.(*sql.NullString)
 	if nullableField.Valid {
 		t, err := time.Parse(SQLDateFormat, nullableField.String)
@@ -100,7 +100,7 @@ func renderNativeDateNullable(sqlField interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func renderNativeTimeNullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeTimeNullable(sqlField interface{}) (interface{}, error) {
 	nullableField := sqlField.(*sql.NullString)
 	if nullableField.Valid {
 		t, err := time.Parse(SQLTimeFormat, nullableField.String)
@@ -113,7 +113,7 @@ func renderNativeTimeNullable(sqlField interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func renderNativeTimestampNullable(schema avro.Schema, sqlField interface{}) (interface{}, error) {
+func sql2NativeTimestampNullable(schema avro.Schema, sqlField interface{}) (interface{}, error) {
 	switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
 	case string(DateTime):
 		nullableField := sqlField.(*sql.NullString)
@@ -136,7 +136,7 @@ func renderNativeTimestampNullable(schema avro.Schema, sqlField interface{}) (in
 	}
 }
 
-func renderNativeDecimalNullable(sqlField interface{}) (interface{}, error) {
+func sql2NativeDecimalNullable(sqlField interface{}) (interface{}, error) {
 	field := *sqlField.(*[]byte)
 	if field != nil {
 		r := new(big.Rat)
