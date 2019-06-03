@@ -1,6 +1,8 @@
 package sqlavro
 
 import (
+	"bytes"
+
 	"github.com/khezen/avro"
 )
 
@@ -32,7 +34,7 @@ func query2CSV(cfg QueryConfig) (csvBytes []byte, newCriteria []Criterion, err e
 	return strings2CSV(cfg, records)
 }
 
-func strings2CSV(cfg QueryConfig, records []map[string]string) (avroBytes []byte, newCriteria []Criterion, err error) {
+func strings2CSV(cfg QueryConfig, records []map[string]string) (csvBytes []byte, newCriteria []Criterion, err error) {
 	recordsLen := len(records)
 	if recordsLen > 0 && cfg.Criteria != nil {
 		newCriteria, err = criteriaFromString(cfg.Schema, records[recordsLen-1], cfg.Criteria)
@@ -42,7 +44,30 @@ func strings2CSV(cfg QueryConfig, records []map[string]string) (avroBytes []byte
 	} else {
 		newCriteria = cfg.Criteria
 	}
-	// create file
+	var (
+		buf       = new(bytes.Buffer)
+		fieldsLen = len(cfg.Schema.Fields)
+		i, j      int
+		fieldName string
+	)
+	for i = 0; i < fieldsLen-1; i++ {
+		buf.WriteString(cfg.Schema.Fields[i].Name)
+		buf.WriteRune(',')
+	}
+	buf.WriteString(cfg.Schema.Fields[fieldsLen-1].Name)
+	buf.WriteRune('\n')
+	for i = 0; i < recordsLen; i++ {
+		for j = 0; i < fieldsLen-1; i++ {
+			fieldName = cfg.Schema.Fields[j].Name
+			buf.WriteString(records[i][fieldName])
+			buf.WriteRune(',')
+		}
+		fieldName = cfg.Schema.Fields[fieldsLen-1].Name
+		buf.WriteString(records[i][fieldName])
+		buf.WriteRune('\n')
+	}
+	csvBytes = buf.Bytes()
+	return csvBytes, newCriteria, nil
 }
 
 func criteriaFromString(schema *avro.RecordSchema, record map[string]string, criteria []Criterion) (newCriteria []Criterion, err error) {
