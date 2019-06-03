@@ -10,20 +10,20 @@
   version = "v1.3.3"
 
 [[projects]]
-  branch = "master"
   digest = "1:e4f5819333ac698d294fe04dbf640f84719658d5c7ce195b10060cc37292ce79"
   name = "github.com/golang/snappy"
   packages = ["."]
   pruneopts = "UT"
   revision = "2a8bb927dd31d8daada140a5d09578521ce5c36a"
+  version = "v0.0.1"
 
 [[projects]]
-  digest = "1:6ff6c3cb744b42df69cb874c3f19d387ece7ba7998e7d4de811c9bf61a7b1a09"
+  digest = "1:e47ce9db1f402ee86ac1815fabeb7b7cb7760d427869d22dd7c74fb68875627b"
   name = "github.com/linkedin/goavro"
   packages = ["."]
   pruneopts = "UT"
-  revision = "af12b3c46392134a7db8c1a8b6c6a33419fab0ea"
-  version = "v2.7.2"
+  revision = "ed2b6675101501e2a4d2186875dd3953ca576fc7"
+  version = "v2.8.5"
 
 [[projects]]
   digest = "1:f95b469161aa3bf30d515403ca1593f566e9d877f1c02479038ce55207118bf5"
@@ -41,6 +41,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/DATA-DOG/go-sqlmock",
+    "github.com/golang/snappy",
     "github.com/linkedin/goavro",
     "github.com/valyala/fastjson",
   ]

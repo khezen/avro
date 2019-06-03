@@ -35,7 +35,7 @@ type QueryConfig struct {
 	// Criteria - Optional list of criterion to retreve data from.
 	Criteria []Criterion
 	// Compression -  Optional name of the compression codec used to compress blocks
-	// "null", "deflate" qnd snappy are accepted.
+	// "null", "deflate" and snappy are accepted.
 	// If the value is empty, it is assumed to be "null"
 	Compression string
 	// Output - define the desired format for the output

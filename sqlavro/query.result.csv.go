@@ -2,6 +2,11 @@ package sqlavro
 
 import (
 	"bytes"
+	"compress/gzip"
+	"fmt"
+	"time"
+
+	"github.com/golang/snappy"
 
 	"github.com/khezen/avro"
 )
@@ -67,6 +72,26 @@ func strings2CSV(cfg QueryConfig, records []map[string]string) (csvBytes []byte,
 		buf.WriteRune('\n')
 	}
 	csvBytes = buf.Bytes()
+	switch cfg.Compression {
+	case "", "null":
+		break
+	case avro.CompressionDeflate:
+		buf.Reset()
+		zw := gzip.NewWriter(buf)
+		zw.Name = fmt.Sprintf("%s.csv", cfg.Schema.Name)
+		zw.ModTime = time.Now().UTC()
+		if _, err := zw.Write(csvBytes); err != nil {
+			return nil, nil, err
+		}
+		if err := zw.Close(); err != nil {
+			return nil, nil, err
+		}
+		csvBytes = buf.Bytes()
+		break
+	case avro.CompressionSnappy:
+		csvBytes = snappy.Encode(nil, csvBytes)
+		break
+	}
 	return csvBytes, newCriteria, nil
 }
 
