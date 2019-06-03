@@ -236,8 +236,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io/ioutil"
-  "time"
-  
+	"time"
+
 	"github.com/khezen/avro"
 	"github.com/khezen/avro/sqlavro"
 )
@@ -296,8 +296,8 @@ func main() {
 		Limit:  limit,
 		Criteria: []sqlavro.Criterion{
 			*sqlavro.NewCriterionDateTime("post_date", &from, order),
-    },
-    Output: "avro",
+		},
+		Output: "avro",
 	})
 	if err != nil {
 		panic(err)
@@ -308,7 +308,6 @@ func main() {
 	}
 	fmt.Println(updatedCriteria)
 }
-
 ```
 
 #### Notes
