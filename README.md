@@ -227,7 +227,7 @@ func main() {
 ]
 ```
 
-### Query records from SQL into AVRO bytes
+### Query records from SQL into AVRO or CSV binary
 
 ```golang
 package main
