@@ -19,7 +19,7 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 * [Discover SQL tables]((#convert-sql-table-to-avro-schema))
 * [Convert SQL tables to AVRO schemas](#convert-sql-table-to-avro-schema)
-* [Query records from SQL into AVRO bytes](#query-records-from-sql-into-avro-bytes)
+* [Query records from SQL into AVRO or CSV binary](#query-records-from-sql-into-avro-bytes)
 
 ## What is AVRO
 
@@ -296,7 +296,8 @@ func main() {
 		Limit:  limit,
 		Criteria: []sqlavro.Criterion{
 			*sqlavro.NewCriterionDateTime("post_date", &from, order),
-		},
+    },
+    Output: "avro",
 	})
 	if err != nil {
 		panic(err)

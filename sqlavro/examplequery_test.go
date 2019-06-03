@@ -65,6 +65,7 @@ func ExampleQuery() {
 		Criteria: []sqlavro.Criterion{
 			*sqlavro.NewCriterionDateTime("post_date", &from, order),
 		},
+		Output: "avro",
 	})
 	if err != nil {
 		panic(err)
