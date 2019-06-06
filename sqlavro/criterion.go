@@ -227,9 +227,9 @@ func rawLimit2Native(schema avro.Schema, limit interface{}) (json.RawMessage, er
 func (c *Criterion) OrderOperand() (string, error) {
 	switch c.Order {
 	case avro.Descending:
-		return "<", nil
+		return "<=", nil
 	case "", avro.Ascending:
-		return ">", nil
+		return ">=", nil
 	default:
 		return "", ErrCannotIgnoreOrder
 	}
