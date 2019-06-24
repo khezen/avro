@@ -8,7 +8,6 @@ type SQLType string
 const (
 
 	// Text types
-
 	// Char -
 	Char SQLType = "char"
 	// NChar -
@@ -67,6 +66,11 @@ const (
 	Time SQLType = "time"
 	// Year -
 	Year SQLType = "year"
+
+	// MySQL specific
+
+	// Bit -
+	Bit SQLType = "bit"
 
 	// SQLDateTimeFormat -
 	SQLDateTimeFormat = "2006-01-02 15:04:05"

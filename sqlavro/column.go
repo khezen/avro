@@ -56,7 +56,7 @@ func sqlColumn2AVROType(columnName string, dataType SQLType, isNullable bool, nu
 		Text, TinyText, MediumText, LongText,
 		Enum, Set:
 		return avro.TypeString, nil
-	case Blob, MediumBlob, LongBlob:
+	case Blob, MediumBlob, LongBlob, Bit:
 		return avro.TypeBytes, nil
 	case TinyInt, SmallInt, MediumInt, Int, Year:
 		return avro.TypeInt32, nil
