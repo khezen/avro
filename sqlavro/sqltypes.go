@@ -8,6 +8,7 @@ type SQLType string
 const (
 
 	// Text types
+
 	// Char -
 	Char SQLType = "char"
 	// NChar -
