@@ -46,7 +46,7 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 
 func sqlColumn2AVROType(columnName string, dataType SQLType, isNullable bool, numPrecision, numScale, charBytesLen int) (fieldType avro.Schema, err error) {
 	switch dataType {
-	case Char, NChar:
+	case Char, NChar, Bit:
 		return &avro.FixedSchema{
 			Name: columnName,
 			Type: avro.TypeFixed,
@@ -56,7 +56,7 @@ func sqlColumn2AVROType(columnName string, dataType SQLType, isNullable bool, nu
 		Text, TinyText, MediumText, LongText,
 		Enum, Set:
 		return avro.TypeString, nil
-	case Blob, MediumBlob, LongBlob, Bit:
+	case Blob, MediumBlob, LongBlob:
 		return avro.TypeBytes, nil
 	case TinyInt, SmallInt, MediumInt, Int, Year:
 		return avro.TypeInt32, nil

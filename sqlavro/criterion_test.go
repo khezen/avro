@@ -30,15 +30,15 @@ func TestCriterion(t *testing.T) {
 		expectedSort     string
 		expectedOrderErr error
 	}{
-		{"test", avro.TypeInt64, &long, long, nil, avro.Ascending, ">", "ASC", nil},
-		{"test", avro.TypeFloat64, &double, double, nil, avro.Descending, "<", "DESC", nil},
-		{"test", avro.TypeString, nilString, nilInterface, nil, "", ">", "ASC", nil},
+		{"test", avro.TypeInt64, &long, long, nil, avro.Ascending, ">=", "ASC", nil},
+		{"test", avro.TypeFloat64, &double, double, nil, avro.Descending, "<=", "DESC", nil},
+		{"test", avro.TypeString, nilString, nilInterface, nil, "", ">=", "ASC", nil},
 		{"test", avro.TypeString, nilString, nilInterface, nil, "Ignore", "", "", ErrCannotIgnoreOrder},
 		{"test", avro.TypeString, nilString, nilInterface, nil, "Something", "", "", ErrCannotIgnoreOrder},
-		{"test", avro.TypeString, &str, str, nil, "", ">", "ASC", nil},
-		{"test", avro.Type(avro.LogicalTypeDate), &date, date.Format(SQLDateFormat), nil, "", ">", "ASC", nil},
-		{"test", avro.Type(avro.LogicalTypeTimestamp), &datetime, datetime.Format(SQLDateTimeFormat), nil, "", ">", "ASC", nil},
-		{"test", avro.Type(avro.LogicalTypeTime), &clock, clock.Format(SQLTimeFormat), nil, "", ">", "ASC", nil},
+		{"test", avro.TypeString, &str, str, nil, "", ">=", "ASC", nil},
+		{"test", avro.Type(avro.LogicalTypeDate), &date, date.Format(SQLDateFormat), nil, "", ">=", "ASC", nil},
+		{"test", avro.Type(avro.LogicalTypeTimestamp), &datetime, datetime.Format(SQLDateTimeFormat), nil, "", ">=", "ASC", nil},
+		{"test", avro.Type(avro.LogicalTypeTime), &clock, clock.Format(SQLTimeFormat), nil, "", ">=", "ASC", nil},
 	}
 	for _, c := range cases {
 		var criterion *Criterion
