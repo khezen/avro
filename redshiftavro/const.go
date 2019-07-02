@@ -7,6 +7,8 @@ const (
 	SortStyleCompound SortStyle = "COMPOUND"
 	// SortStyleInterleaved -
 	SortStyleInterleaved SortStyle = "INTERLEAVED"
+	// SortStyleNormal -
+	SortStyleNormal SortStyle = ""
 	// DistStyleAuto -
 	DistStyleAuto DistStyle = "AUTO"
 	// DistStyleEven -

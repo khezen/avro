@@ -19,14 +19,17 @@ func CreateTableStatement(cfg CreateConfig) (string, error) {
 	buf.WriteString(tableName)
 	buf.WriteRune('(')
 	var (
-		fieldsLen  = len(cfg.Schema.Fields)
-		i          int
-		field      avro.RecordFieldSchema
-		columnStmt string
-		err        error
+		mapSortKeys = mapSortKeys(cfg.SortKeys)
+		fieldsLen   = len(cfg.Schema.Fields)
+		i           int
+		field       avro.RecordFieldSchema
+		columnStmt  string
+		err         error
+		isSortKey   bool
 	)
 	for i, field = range cfg.Schema.Fields {
-		columnStmt, err = createColumnStatement(field, nil, nil)
+		_, isSortKey = mapSortKeys[field.Name]
+		columnStmt, err = createColumnStatement(field, isSortKey)
 		if err != nil {
 			return "", err
 		}
@@ -39,7 +42,7 @@ func CreateTableStatement(cfg CreateConfig) (string, error) {
 	return buf.String(), nil
 }
 
-func createColumnStatement(field avro.RecordFieldSchema, sortKey *SortKey, distKey *DistKey) (string, error) {
+func createColumnStatement(field avro.RecordFieldSchema, isSortKey bool) (string, error) {
 	var (
 		columnName = sqlavro.SQLEscape(field.Name)
 		buf        = new(bytes.Buffer)
@@ -48,7 +51,7 @@ func createColumnStatement(field avro.RecordFieldSchema, sortKey *SortKey, distK
 	if err != nil {
 		return "", err
 	}
-	encoding, err := renderDefaultEncoding(redshiftType, sortKey)
+	encoding, err := renderDefaultEncoding(redshiftType, isSortKey)
 	buf.WriteString(columnName)
 	buf.WriteRune(' ')
 	buf.WriteString(typeStatement)
@@ -56,16 +59,6 @@ func createColumnStatement(field avro.RecordFieldSchema, sortKey *SortKey, distK
 	buf.WriteString("ENCODE ")
 	buf.WriteString(string(encoding))
 	buf.WriteRune(' ')
-	if sortKey != nil {
-		buf.WriteString("SORTKEY ")
-		buf.WriteString(string(sortKey.SortStyle))
-		buf.WriteRune(' ')
-	}
-	if distKey != nil {
-		buf.WriteString("DISTKEY ")
-		buf.WriteString(string(distKey.DistStyle))
-		buf.WriteRune(' ')
-	}
 	if !isNullable {
 		buf.WriteString("NOT NULL")
 	} else {
@@ -127,14 +120,17 @@ func renderType(field avro.RecordFieldSchema) (typeStatement string, redshiftTyp
 	case avro.Type(avro.LogicalTypeDate):
 		return string(Date), Date, isNullable, nil
 	case avro.Type(avro.LogicalTypeTime), avro.Type(avro.LogicalTypeTimestamp):
-		return string(Timestamp), Timestamp, isNullable, nil
+		buf := bytes.NewBufferString(string(Timestamp))
+		buf.WriteRune(' ')
+		buf.WriteString("WITHOUT TIME ZONE")
+		return buf.String(), Timestamp, isNullable, nil
 	default:
 		return "", RedshiftType(""), false, ErrUnsupportedRedshiftType
 	}
 }
 
-func renderDefaultEncoding(redshiftType RedshiftType, sortKey *SortKey) (encoding RedshiftEncoding, err error) {
-	if sortKey != nil {
+func renderDefaultEncoding(redshiftType RedshiftType, isSortKey bool) (encoding RedshiftEncoding, err error) {
+	if isSortKey {
 		return Raw, nil
 	}
 	switch redshiftType {
@@ -161,4 +157,15 @@ func renderDefaultEncoding(redshiftType RedshiftType, sortKey *SortKey) (encodin
 	default:
 		return RedshiftEncoding(""), ErrUnsupportedRedshiftType
 	}
+}
+
+func mapSortKeys(sortKeys []string) map[string]struct{} {
+	sortKeyMap := make(map[string]struct{})
+	if sortKeys == nil {
+		return sortKeyMap
+	}
+	for _, sortKey := range sortKeys {
+		sortKeyMap[sortKey] = struct{}{}
+	}
+	return sortKeyMap
 }

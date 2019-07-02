@@ -5,25 +5,15 @@ import "github.com/khezen/avro"
 // CreateConfig -
 type CreateConfig struct {
 	Schema      avro.RecordSchema
-	SortKeys    []SortKey
-	distKey     *DistKey
+	SortKeys    []string
+	SortStyle   SortStyle
+	DistKey     *string
+	DistStyle   DistStyle
 	IfNotExists bool
-}
-
-// DistKey - Distribution key
-type DistKey struct {
-	Column    string
-	DistStyle DistStyle
 }
 
 // DistStyle -
 type DistStyle string
-
-// SortKey -
-type SortKey struct {
-	Column    string
-	SortStyle SortStyle
-}
 
 // SortStyle -
 type SortStyle string
