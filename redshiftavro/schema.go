@@ -13,7 +13,7 @@ type CreateConfig struct {
 // DistKey - Distribution key
 type DistKey struct {
 	Column    string
-	distStyle DistStyle
+	DistStyle DistStyle
 }
 
 // DistStyle -
@@ -22,7 +22,7 @@ type DistStyle string
 // SortKey -
 type SortKey struct {
 	Column    string
-	sortStyle SortStyle
+	SortStyle SortStyle
 }
 
 // SortStyle -
@@ -30,3 +30,6 @@ type SortStyle string
 
 // RedshiftType -
 type RedshiftType string
+
+// RedshiftEncoding -
+type RedshiftEncoding string

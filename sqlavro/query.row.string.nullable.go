@@ -9,7 +9,7 @@ import (
 
 func sql2StringFieldNullable(schema avro.Schema, sqlField interface{}) (string, error) {
 	union := schema.(avro.UnionSchema)
-	subSchema, err := underlyingType(union)
+	subSchema, err := UnderlyingType(union)
 	if err != nil {
 		return "", err
 	}

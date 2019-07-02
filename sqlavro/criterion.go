@@ -31,7 +31,7 @@ func (c *Criterion) Limit() (interface{}, error) {
 		err    error
 	)
 	if c.fieldSchema.Type.TypeName() == avro.TypeUnion {
-		schema, err = underlyingType(c.fieldSchema.Type.(avro.UnionSchema))
+		schema, err = UnderlyingType(c.fieldSchema.Type.(avro.UnionSchema))
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +92,7 @@ func (c *Criterion) setLimitFromNative(limit interface{}) error {
 		err    error
 	)
 	if c.fieldSchema.Type.TypeName() == avro.TypeUnion {
-		schema, err = underlyingType(c.fieldSchema.Type.(avro.UnionSchema))
+		schema, err = UnderlyingType(c.fieldSchema.Type.(avro.UnionSchema))
 		if err != nil {
 			return err
 		}
@@ -135,7 +135,7 @@ func (c *Criterion) setLimitFromString(limit string) error {
 		err    error
 	)
 	if c.fieldSchema.Type.TypeName() == avro.TypeUnion {
-		schema, err = underlyingType(c.fieldSchema.Type.(avro.UnionSchema))
+		schema, err = UnderlyingType(c.fieldSchema.Type.(avro.UnionSchema))
 		if err != nil {
 			return err
 		}
