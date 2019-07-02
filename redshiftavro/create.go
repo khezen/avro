@@ -39,6 +39,52 @@ func CreateTableStatement(cfg CreateConfig) (string, error) {
 		}
 	}
 	buf.WriteRune(')')
+	switch {
+	case cfg.DistStyle == DistStyleAll:
+		buf.WriteString(" DISTSTYLE ALL")
+		break
+	case cfg.DistStyle == DistStyleEven:
+		buf.WriteString(" DISTSTYLE EVEN")
+		break
+	case cfg.DistStyle == DistStyleAuto:
+		buf.WriteString(" DISTSTYLE AUTO")
+		break
+	case cfg.DistStyle == DistStyleKey && cfg.DistKey != nil:
+		buf.WriteString(" DISTSTYLE KEY")
+		buf.WriteString(" DISTKEY(")
+		buf.WriteString(*cfg.DistKey)
+		buf.WriteString(") ")
+		break
+	case cfg.DistStyle == "":
+		if cfg.DistKey != nil {
+			buf.WriteString(" DISTKEY(")
+			buf.WriteString(*cfg.DistKey)
+			buf.WriteString(") ")
+		}
+		break
+	default:
+		return "", ErrUnuspportedDistributionStyle
+	}
+	if len(cfg.SortKeys) > 0 {
+		switch cfg.SortStyle {
+		case SortStyleCompound, SortStyleInterleaved, SortStyleNormal:
+			buf.WriteString(string(cfg.SortStyle))
+			buf.WriteRune(' ')
+		}
+		buf.WriteString("SORTKEY(")
+		var (
+			i           int
+			sortKeysLen = len(cfg.SortKeys)
+		)
+		for i = 0; i < sortKeysLen; i++ {
+			buf.WriteString(cfg.SortKeys[i])
+			if i < sortKeysLen-1 {
+				buf.WriteRune(',')
+			}
+		}
+		buf.WriteRune(')')
+	}
+	buf.WriteRune(';')
 	return buf.String(), nil
 }
 
