@@ -13,7 +13,8 @@ var (
 	}
 )
 
-func sqlEscape(input string) string {
+// SQLEscape -
+func SQLEscape(input string) string {
 	outputBuf := bytes.NewBuffer([]byte{})
 	for _, r := range input {
 		if _, ok := rogueRunes[r]; ok {

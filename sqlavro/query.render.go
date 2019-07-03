@@ -29,7 +29,7 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 			fieldName = schema.Fields[i].Name
 		}
 		qBuf.WriteRune('`')
-		qBuf.WriteString(sqlEscape(fieldName))
+		qBuf.WriteString(SQLEscape(fieldName))
 		qBuf.WriteString("`,")
 	}
 	lastIndex := fieldsLen - 1
@@ -39,10 +39,10 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 		fieldName = schema.Fields[lastIndex].Name
 	}
 	qBuf.WriteRune('`')
-	qBuf.WriteString(sqlEscape(fieldName))
+	qBuf.WriteString(SQLEscape(fieldName))
 	qBuf.WriteString("` FROM `")
 	if len(schema.Namespace) > 0 {
-		qBuf.WriteString(sqlEscape(dbName))
+		qBuf.WriteString(SQLEscape(dbName))
 		qBuf.WriteString("`.`")
 	}
 	var tableName string
@@ -51,7 +51,7 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 	} else {
 		tableName = schema.Name
 	}
-	qBuf.WriteString(sqlEscape(tableName))
+	qBuf.WriteString(SQLEscape(tableName))
 	qBuf.WriteRune('`')
 	if criteriaLen == 0 {
 		return qBuf.String(), params, nil
@@ -80,7 +80,7 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 			return "", nil, err
 		}
 		qBuf.WriteString(" `")
-		qBuf.WriteString(sqlEscape(criterion.FieldName))
+		qBuf.WriteString(SQLEscape(criterion.FieldName))
 		qBuf.WriteRune('`')
 		qBuf.WriteString(operand)
 		qBuf.WriteString("?")
@@ -92,7 +92,7 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 	qBuf.WriteString(" ORDER BY")
 	for i, criterion := range criteria {
 		qBuf.WriteString(" `")
-		qBuf.WriteString(sqlEscape(criterion.FieldName))
+		qBuf.WriteString(SQLEscape(criterion.FieldName))
 		qBuf.WriteRune('`')
 		if i < criteriaLen-1 {
 			qBuf.WriteString(",")

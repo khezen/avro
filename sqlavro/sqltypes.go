@@ -83,7 +83,8 @@ const (
 	SQLTimeFormat = "15:04:05"
 )
 
-func underlyingType(union avro.UnionSchema) (avro.Schema, error) {
+// UnderlyingType -
+func UnderlyingType(union avro.UnionSchema) (avro.Schema, error) {
 	isNullable := false
 	var subSchema avro.Schema
 	if len(union) > 2 {

@@ -66,7 +66,7 @@ func renderSQLTimestamp(schema avro.Schema) (interface{}, error) {
 
 func renderSQLFieldNullable(schema avro.Schema) (interface{}, error) {
 	union := schema.(avro.UnionSchema)
-	subSchema, err := underlyingType(union)
+	subSchema, err := UnderlyingType(union)
 	if err != nil {
 		return nil, err
 	}
