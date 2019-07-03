@@ -98,6 +98,9 @@ func createColumnStatement(field avro.RecordFieldSchema, isSortKey bool) (string
 		return "", err
 	}
 	encoding, err := renderDefaultEncoding(redshiftType, isSortKey)
+	if err != nil {
+		return "", err
+	}
 	buf.WriteString(columnName)
 	buf.WriteRune(' ')
 	buf.WriteString(typeStatement)
