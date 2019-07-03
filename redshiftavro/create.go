@@ -132,7 +132,7 @@ func renderType(field avro.RecordFieldSchema) (typeStatement string, redshiftTyp
 	case avro.TypeFloat32:
 		return string(Real), Real, isNullable, nil
 	case avro.TypeFloat64:
-		return string(Double), Double, isNullable, nil
+		return "DOUBLE PRECISION", Double, isNullable, nil
 	case avro.Type(avro.LogicalTypeDecimal):
 		buf := new(bytes.Buffer)
 		buf.WriteString(string(Decimal))
