@@ -17,9 +17,15 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/sqlavro)
 
-* [Discover SQL tables]((#convert-sql-table-to-avro-schema))
+* [Discover SQL tables](#convert-sql-table-to-avro-schema)
 * [Convert SQL tables to AVRO schemas](#convert-sql-table-to-avro-schema)
-* [Query records from SQL into AVRO or CSV binary](#query-records-from-sql-into-avro-bytes)
+* [Query records from SQL into AVRO or CSV binary](#query-records-from-sql-into-avro-or-csv-binary)
+
+### `github.com/khezen/avro/redshiftavro`
+
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/redshiftavro)
+
+* [Produce Redshit create statement from AVRO schema](#produce-redshift-create-statement-from-avro-schema)
 
 ## What is AVRO
 
@@ -339,6 +345,114 @@ Because of encoding rules for Avro unions, when an union's value is
 is non-`nil`, a Go `map[string]interface{}` with a single key is
 returned for the union. The map's single key is the Avro type name and
 its value is the datum's value.
+
+### Produce Redshift create statement from AVRO schema
+
+```golang
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/khezen/avro"
+	"github.com/khezen/avro/redshiftavro"
+)
+
+func main() {
+	schemaBytes := []byte(`
+	{
+        "type": "record",
+        "namespace": "blog",
+        "name": "posts",
+        "fields": [
+            {
+                "name": "ID",
+                "type": "int"
+            },
+            {
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "name": "body",
+                "type": "bytes"
+            },
+            {
+                "name": "content_type",
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "default": "text/markdown; charset=UTF-8"
+            },
+            {
+                "name": "post_date",
+                "type": {
+                    "type": "int",
+                    "doc":"datetime",
+                    "logicalType": "timestamp"
+                }
+            },
+            {
+                "name": "update_date",
+                "type": [
+                    "null",
+                    {
+                        "type": "int",
+                        "doc":"datetime",
+                        "logicalType": "timestamp"
+                    }
+                ]
+            },
+            {
+                "name": "reading_time_minutes",
+                "type": [
+                    "null",
+                    {
+                        "type": "bytes",
+                        "logicalType": "decimal",
+                        "precision": 3,
+                        "scale": 1
+                    }
+                ]
+            }
+        ]
+	}`)
+	var anySchema avro.AnySchema
+	err := json.Unmarshal(schemaBytes, &anySchema)
+	if err != nil {
+		panic(err)
+	}
+	schema := anySchema.Schema().(*avro.RecordSchema)
+	cfg := redshiftavro.CreateConfig{
+		Schema:      *schema,
+		SortKeys:    []string{"post_date", "title"},
+		IfNotExists: true,
+	}
+	statement, err := redshiftavro.CreateTableStatement(cfg)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(statement)
+}
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS posts(
+	ID INTEGER ENCODE LZO NOT NULL,
+	title VARCHAR(65535) ENCODE RAW NOT NULL,
+	body VARCHAR(65535) ENCODE ZSTD NOT NULL,
+	content_type VARCHAR(65535) ENCODE ZSTD NULL,
+	post_date TIMESTAMP WITHOUT TIME ZONE ENCODE RAW NOT NULL,
+	update_date TIMESTAMP WITHOUT TIME ZONE ENCODE LZO NULL,
+	reading_time_minutes DECIMAL(3,1) ENCODE RAW NULL
+)
+SORTKEY(
+	post_date,
+	title
+)
+```
 
 ## Issues
 
