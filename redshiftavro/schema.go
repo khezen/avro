@@ -4,12 +4,13 @@ import "github.com/khezen/avro"
 
 // CreateConfig -
 type CreateConfig struct {
-	Schema      avro.RecordSchema
-	SortKeys    []string
-	SortStyle   SortStyle
-	DistKey     *string
-	DistStyle   DistStyle
-	IfNotExists bool
+	Schema            avro.RecordSchema
+	SortKeys          []string
+	SortStyle         SortStyle
+	DistKey           *string
+	DistStyle         DistStyle
+	IfNotExists       bool
+	TableNameOverride string
 }
 
 // DistStyle -

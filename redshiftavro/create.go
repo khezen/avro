@@ -15,7 +15,12 @@ func CreateTableStatement(cfg CreateConfig) (string, error) {
 	if cfg.IfNotExists {
 		buf.WriteString("IF NOT EXISTS ")
 	}
-	tableName := sqlavro.SQLEscape(cfg.Schema.Name)
+	var tableName string
+	if len(cfg.TableNameOverride) > 0 {
+		tableName = sqlavro.SQLEscape(cfg.TableNameOverride)
+	} else {
+		tableName = sqlavro.SQLEscape(cfg.Schema.Name)
+	}
 	buf.WriteString(tableName)
 	buf.WriteRune('(')
 	var (
