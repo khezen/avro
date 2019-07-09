@@ -85,18 +85,18 @@ func ExampleCreateTableStatement() {
 		panic(err)
 	}
 	fmt.Println(statement)
-}
 
-// CREATE TABLE IF NOT EXISTS posts(
-// 	ID INTEGER ENCODE LZO NOT NULL,
-// 	title VARCHAR(65535) ENCODE RAW NOT NULL,
-// 	body VARCHAR(65535) ENCODE ZSTD NOT NULL,
-// 	content_type VARCHAR(65535) ENCODE ZSTD NULL,
-// 	post_date TIMESTAMP WITHOUT TIME ZONE ENCODE RAW NOT NULL,
-// 	update_date TIMESTAMP WITHOUT TIME ZONE ENCODE LZO NULL,
-// 	reading_time_minutes DECIMAL(3,1) ENCODE RAW NULL
-// )
-// SORTKEY(
-// 	post_date,
-// 	title
-// )
+	// CREATE TABLE IF NOT EXISTS posts(
+	// 	ID INTEGER ENCODE LZO NOT NULL,
+	// 	title VARCHAR(65535) ENCODE RAW NOT NULL,
+	// 	body VARCHAR(65535) ENCODE ZSTD NOT NULL,
+	// 	content_type VARCHAR(65535) ENCODE ZSTD NULL,
+	// 	post_date TIMESTAMP WITHOUT TIME ZONE ENCODE RAW NOT NULL,
+	// 	update_date TIMESTAMP WITHOUT TIME ZONE ENCODE LZO NULL,
+	// 	reading_time_minutes DECIMAL(3,1) ENCODE RAW NULL
+	// )
+	// SORTKEY(
+	// 	post_date,
+	// 	title
+	// )
+}
