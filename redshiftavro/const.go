@@ -9,6 +9,9 @@ const (
 	SortStyleInterleaved SortStyle = "INTERLEAVED"
 	// SortStyleNormal -
 	SortStyleNormal SortStyle = ""
+)
+
+const (
 	// DistStyleAuto -
 	DistStyleAuto DistStyle = "AUTO"
 	// DistStyleEven -

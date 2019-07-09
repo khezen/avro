@@ -21,6 +21,12 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 * [Convert SQL tables to AVRO schemas](#convert-sql-table-to-avro-schema)
 * [Query records from SQL into AVRO or CSV binary](#query-records-from-sql-into-avro-bytes)
 
+### `github.com/khezen/avro/redshiftavro`
+
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/redshiftavro)
+
+* [Create Redshit create statement from AVRO schema]((#create-redshift-create-statement-from-avro-schema))
+
 ## What is AVRO
 
 [Apache AVRO](http://avro.apache.org/docs/current/spec.html) is a data serialization system which relies on JSON schemas.
