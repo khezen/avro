@@ -17,7 +17,7 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/sqlavro)
 
-* [Discover SQL tables]((#convert-sql-table-to-avro-schema))
+* [Discover SQL tables](#convert-sql-table-to-avro-schema)
 * [Convert SQL tables to AVRO schemas](#convert-sql-table-to-avro-schema)
 * [Query records from SQL into AVRO or CSV binary](#query-records-from-sql-into-avro-or-csv-binary)
 
@@ -25,7 +25,7 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/redshiftavro)
 
-* [Produce Redshit create statement from AVRO schema]((#produce-redshift-create-statement-from-avro-schema))
+* [Produce Redshit create statement from AVRO schema](#produce-redshift-create-statement-from-avro-schema)
 
 ## What is AVRO
 
