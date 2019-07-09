@@ -25,7 +25,7 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/redshiftavro)
 
-* [Create Redshit create statement from AVRO schema]((#create-redshift-create-statement-from-avro-schema))
+* [Produce Redshit create statement from AVRO schema]((#create-redshift-create-statement-from-avro-schema))
 
 ## What is AVRO
 
