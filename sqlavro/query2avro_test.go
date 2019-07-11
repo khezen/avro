@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"testing"
 
@@ -197,6 +198,7 @@ func TestQuery2AVRO(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(string(collectionSchemaBytes))
 	codec, err := goavro.NewCodec(string(collectionSchemaBytes))
 	if err != nil {
 		t.Error(err)
