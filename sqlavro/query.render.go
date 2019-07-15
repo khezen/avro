@@ -104,7 +104,9 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 	}
 	qBuf.WriteRune(' ')
 	qBuf.WriteString(sort)
-	qBuf.WriteString(" LIMIT ?")
-	params = append(params, limit)
+	if limit > 0 {
+		qBuf.WriteString(" LIMIT ?")
+		params = append(params, limit)
+	}
 	return qBuf.String(), params, nil
 }
