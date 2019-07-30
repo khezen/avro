@@ -33,14 +33,7 @@ func sql2StringFieldNotNull(schema avro.Schema, sqlField interface{}) (string, e
 }
 
 func sql2StringTimestamp(schema avro.Schema, sqlField interface{}) (string, error) {
-	switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
-	case string(DateTime):
-		return *sqlField.(*string), nil
-	case "", string(Timestamp):
-		return strconv.FormatInt(int64(*sqlField.(*int32)), 32), nil
-	default:
-		return "", ErrUnsupportedTypeForSQL
-	}
+	return *sqlField.(*string), nil
 }
 
 func sql2StringTime(sqlField interface{}) (string, error) {

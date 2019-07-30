@@ -79,16 +79,8 @@ func sql2StringTimeNullable(sqlField interface{}) string {
 }
 
 func sql2StringTimestampNullable(schema avro.Schema, sqlField interface{}) (string, error) {
-	switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
-	case string(DateTime):
-		nullableField := sqlField.(*sql.NullString)
-		return nullableField.String, nil
-	case "", string(Timestamp):
-		nullableField := sqlField.(*sql.NullInt64)
-		return strconv.FormatInt(nullableField.Int64, 10), nil
-	default:
-		return "", ErrUnsupportedTypeForSQL
-	}
+	nullableField := sqlField.(*sql.NullString)
+	return nullableField.String, nil
 }
 
 func sql2StringDecimalNullable(sqlField interface{}) string {

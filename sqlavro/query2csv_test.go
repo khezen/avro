@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
-	"strconv"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -117,15 +116,15 @@ func TestQuery2CSV(t *testing.T) {
 				sql.NullString{Valid: true, String: "2009-04-10 00:00:00"},
 				sql.NullString{Valid: true, String: "2.0"},
 				"3000.46",
-				"2009-04-10",
+				"2009-04-10 00:00:00",
 				"00:00:00",
-				1254614400,
+				"2009-04-10",
 				4242,
 				4242.4242,
 				42.42,
 				sql.NullString{Valid: true, String: "2009-04-10"},
 				sql.NullString{Valid: true, String: "00:00:00"},
-				sql.NullInt64{Valid: true, Int64: 1254614400},
+				sql.NullString{Valid: true, String: "2009-04-10 00:00:00"},
 				sql.NullInt64{Valid: true, Int64: 42},
 				sql.NullInt64{Valid: true, Int64: 4242},
 				sql.NullFloat64{Valid: true, Float64: 4242.4242},
@@ -142,7 +141,7 @@ func TestQuery2CSV(t *testing.T) {
 	).WillReturnRows(mockPostsRows)
 	dateStr := json.RawMessage(`"1970-01-01"`)
 	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
-	timeStampStr := json.RawMessage(strconv.FormatInt(0, 10))
+	timeStampStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
 	csvBytes, _, err := Query(QueryConfig{
 		DB:     db,
 		DBName: "blog",

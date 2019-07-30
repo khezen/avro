@@ -51,19 +51,12 @@ func (c *Criterion) limit(schema avro.Schema) (interface{}, error) {
 	case avro.TypeString:
 		return string(*c.RawLimit)[1 : len(*c.RawLimit)-1], nil
 	case avro.Type(avro.LogicalTypeTimestamp):
-		switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
-		case "datetime":
-			dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
-			t, err := time.Parse(time.RFC3339Nano, dst)
-			if err != nil {
-				return nil, err
-			}
-			return t.Format(SQLDateTimeFormat), nil
-		case "timestamp":
-			return strconv.ParseInt(string(*c.RawLimit), 10, 64)
-		default:
-			return nil, ErrUnsupportedTypeForCriterion
+		dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
+		t, err := time.Parse(time.RFC3339Nano, dst)
+		if err != nil {
+			return nil, err
 		}
+		return t.Format(SQLDateTimeFormat), nil
 	case avro.Type(avro.LogicalTypeDate):
 		dst := string(*c.RawLimit)[1 : len(*c.RawLimit)-1]
 		_, err := time.Parse(SQLDateFormat, dst)
@@ -166,26 +159,12 @@ func rawLimit2String(schema avro.Schema, limit string) (json.RawMessage, error) 
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit))
 		return rawLimit, nil
 	case avro.Type(avro.LogicalTypeTimestamp):
-		derivateSchema := schema.(*avro.DerivedPrimitiveSchema)
-		switch derivateSchema.Documentation {
-		case string(DateTime):
-			t, err := time.Parse(SQLDateTimeFormat, limit)
-			if err != nil {
-				return nil, err
-			}
-			rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
-			return rawLimit, nil
-		case string(Timestamp):
-			timestamp, err := strconv.ParseInt(limit, 10, 32)
-			if err != nil {
-				return nil, err
-			}
-			t := time.Date(1970, 1, 1, 0, 0, int(timestamp), 0, time.UTC)
-			rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
-			return rawLimit, nil
-		default:
-			return nil, ErrUnsupportedTypeForCriterion
+		t, err := time.Parse(SQLDateTimeFormat, limit)
+		if err != nil {
+			return nil, err
 		}
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+		return rawLimit, nil
 	default:
 		return nil, ErrUnsupportedTypeForCriterion
 	}

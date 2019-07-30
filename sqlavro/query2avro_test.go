@@ -6,7 +6,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -125,13 +124,13 @@ func TestQuery2AVRO(t *testing.T) {
 				"3000.46",
 				"2009-04-10",
 				"00:00:00",
-				1254614400,
+				"2009-04-10 00:00:00",
 				4242,
 				4242.4242,
 				42.42,
 				sql.NullString{Valid: true, String: "2009-04-10"},
 				sql.NullString{Valid: true, String: "00:00:00"},
-				sql.NullInt64{Valid: true, Int64: 1254614400},
+				sql.NullString{Valid: true, String: "2009-04-10 00:00:00"},
 				sql.NullInt64{Valid: true, Int64: 42},
 				sql.NullInt64{Valid: true, Int64: 4242},
 				sql.NullFloat64{Valid: true, Float64: 4242.4242},
@@ -148,7 +147,7 @@ func TestQuery2AVRO(t *testing.T) {
 	).WillReturnRows(mockPostsRows)
 	dateStr := json.RawMessage(`"1970-01-01"`)
 	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
-	timeStampStr := json.RawMessage(strconv.FormatInt(0, 10))
+	timeStampStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
 	avroBytes, _, err := Query(QueryConfig{
 		DB:     db,
 		DBName: "blog",
@@ -208,7 +207,7 @@ func TestQuery2AVRO(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	expetedTextual := `[{"post_datetime":1239321600,"update_timestamp":{"int":1254614400},"title":"lorem ipsum","update_time":{"int":2764800},"post_timestamp":1254614400,"update_date":{"int.date":14344},"some_nullable_float32":{"float":42.42},"some_nullable_float64":{"double":4242.4242},"post_date":14344,"author":{"string":"John Doe"},"body":"lorem ipsum etc...","reading_time_minutes":{"bytes.decimal":"\u0014"},"some_float64":4242.4242,"ID":42,"some_int64":4242,"some_nullable_int64":{"long":4242},"content_type":null,"some_nullable_int32":{"int":42},"daily_average_traffic":"u4","some_float32":42.42,"some_nullable_blob":{"bytes":"lorem ipsum dolor etc..."},"update_datetime":{"int":1239321600},"post_time":2764800}]`
+	expetedTextual := `[{"body":"lorem ipsum etc...","title":"lorem ipsum","post_date":14344,"content_type":null,"update_date":{"int.date":14344},"update_timestamp":{"int":1239321600},"some_nullable_int32":{"int":42},"post_timestamp":1239321600,"ID":42,"update_time":{"int":2764800},"update_datetime":{"int":1239321600},"post_time":2764800,"some_nullable_float64":{"double":4242.4242},"daily_average_traffic":"u4","some_nullable_blob":{"bytes":"lorem ipsum dolor etc..."},"post_datetime":1239321600,"some_nullable_int64":{"long":4242},"reading_time_minutes":{"bytes.decimal":"\u0014"},"some_int64":4242,"some_float64":4242.4242,"some_float32":42.42,"some_nullable_float32":{"float":42.42},"author":{"string":"John Doe"}}]`
 	if !JSONArraysEquals([]byte(expetedTextual), textual) {
 		t.Errorf("expected:\n%s\ngot:\n%s\n", string(expetedTextual), string(textual))
 	}

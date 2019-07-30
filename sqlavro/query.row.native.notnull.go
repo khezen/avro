@@ -35,19 +35,12 @@ func sql2NativeFieldNotNull(schema avro.Schema, sqlField interface{}) (interface
 }
 
 func sql2NativeTimestamp(schema avro.Schema, sqlField interface{}) (interface{}, error) {
-	switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
-	case string(DateTime):
-		timeStr := *sqlField.(*string)
-		t, err := time.Parse(SQLDateTimeFormat, timeStr)
-		if err != nil {
-			return nil, err
-		}
-		return int32(t.Unix()), nil
-	case "", string(Timestamp):
-		return *sqlField.(*int32), nil
-	default:
-		return nil, ErrUnsupportedTypeForSQL
+	timeStr := *sqlField.(*string)
+	t, err := time.Parse(SQLDateTimeFormat, timeStr)
+	if err != nil {
+		return nil, err
 	}
+	return int32(t.Unix()), nil
 }
 
 func sql2NativeTime(sqlField interface{}) (interface{}, error) {

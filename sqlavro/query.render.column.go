@@ -52,16 +52,8 @@ func renderSQLFieldNotNull(schema avro.Schema) (interface{}, error) {
 }
 
 func renderSQLTimestamp(schema avro.Schema) (interface{}, error) {
-	switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
-	case string(DateTime):
-		var field string
-		return &field, nil
-	case "", string(Timestamp):
-		var field int32
-		return &field, nil
-	default:
-		return nil, ErrUnsupportedTypeForSQL
-	}
+	var field string
+	return &field, nil
 }
 
 func renderSQLFieldNullable(schema avro.Schema) (interface{}, error) {
@@ -90,14 +82,6 @@ func renderSQLFieldNullable(schema avro.Schema) (interface{}, error) {
 }
 
 func renderSQLTimestampNullable(schema avro.Schema) (interface{}, error) {
-	switch schema.(*avro.DerivedPrimitiveSchema).Documentation {
-	case string(DateTime):
-		var field sql.NullString
-		return &field, nil
-	case "", string(Timestamp):
-		var field sql.NullInt64
-		return &field, nil
-	default:
-		return nil, ErrUnsupportedTypeForSQL
-	}
+	var field sql.NullString
+	return &field, nil
 }
