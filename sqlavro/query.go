@@ -21,6 +21,8 @@ func Query(cfg QueryConfig) (avroBytes []byte, newCriteria []Criterion, err erro
 	return avroBytes, newCriteria, err
 }
 
+var noRune rune
+
 // QueryConfig -
 type QueryConfig struct {
 	// DB - Required SQL connection pool used to access the database.
@@ -42,6 +44,10 @@ type QueryConfig struct {
 	// AVRO and CSV are supported
 	// if not set, then AVRO is the default choice
 	Output string
+	// Separator - if you use CSV output format then
+	// you might want to set the separator.
+	// Default value is ';'
+	Separator rune
 }
 
 // Verify and ensure the config is valid
@@ -63,6 +69,9 @@ func (qc *QueryConfig) Verify() error {
 	}
 	if qc.Output != "" && qc.Output != outputAVRO && qc.Output != outputCSV {
 		return ErrUnsupportedOutput
+	}
+	if qc.Separator == noRune {
+		qc.Separator = ';'
 	}
 	return nil
 }
