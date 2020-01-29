@@ -57,7 +57,7 @@ func strings2CSV(cfg QueryConfig, records []map[string]string) (csvBytes []byte,
 	)
 	for i = 0; i < fieldsLen-1; i++ {
 		buf.WriteString(cfg.Schema.Fields[i].Name)
-		buf.WriteRune(',')
+		buf.WriteRune(cfg.Separator)
 	}
 	buf.WriteString(cfg.Schema.Fields[fieldsLen-1].Name)
 	buf.WriteRune('\n')
