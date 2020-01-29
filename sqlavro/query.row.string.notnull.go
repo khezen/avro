@@ -55,7 +55,7 @@ func bytesString(raw []byte) string {
 	bytesBuf := bytes.NewBuffer([]byte{})
 	for _, bit := range raw {
 
-		bytesBuf.WriteString(fmt.Sprintf("%x ", bit))
+		bytesBuf.WriteString(fmt.Sprintf("%x", bit))
 	}
 	return bytesBuf.String()
 }
