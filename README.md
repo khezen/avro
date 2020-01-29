@@ -1,7 +1,7 @@
 # *avro*
 
-[![Build Status](http://img.shields.io/travis/khezen/avro.svg?style=flat-square)](https://travis-ci.org/khezen/avro) [![codecov](https://img.shields.io/codecov/c/github/khezen/avro/master.svg?style=flat-square)](https://codecov.io/gh/khezen/avro)
-[![Go Report Card](https://goreportcard.com/badge/github.com/khezen/avro?style=flat-square)](https://goreportcard.com/report/github.com/khezen/avro)
+[![Build Status](https://github.com/khezen/avro/workflows/build/badge.svg?branch=master)](https://github.com/khezen/avro/actions?query=workflow%3Abuild) [![codecov](https://img.shields.io/codecov/c/github/khezen/avro/master.svg)](https://codecov.io/gh/khezen/avro)
+[![Go Report Card](https://goreportcard.com/badge/github.com/khezen/avro)](https://goreportcard.com/report/github.com/khezen/avro)
 
 The purpose of this package is to facilitate use of AVRO with `go` strong typing.
 
@@ -9,13 +9,13 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 ### `github.com/khezen/avro`
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro)
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg)](https://godoc.org/github.com/khezen/avro)
 
 * [Marshal/Unmarshal AVRO schema](#schema-marshalunmarshal)
 
 ### `github.com/khezen/avro/sqlavro`
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/sqlavro)
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg)](https://godoc.org/github.com/khezen/avro/sqlavro)
 
 * [Discover SQL tables](#convert-sql-table-to-avro-schema)
 * [Convert SQL tables to AVRO schemas](#convert-sql-table-to-avro-schema)
@@ -23,7 +23,7 @@ The purpose of this package is to facilitate use of AVRO with `go` strong typing
 
 ### `github.com/khezen/avro/redshiftavro`
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://godoc.org/github.com/khezen/avro/redshiftavro)
+[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg)](https://godoc.org/github.com/khezen/avro/redshiftavro)
 
 * [Produce Redshit create statement from AVRO schema](#produce-redshift-create-statement-from-avro-schema)
 

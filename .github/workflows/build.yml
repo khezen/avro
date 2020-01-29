@@ -1,0 +1,38 @@
+name: build
+on: [push]
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    container: 
+      image: golang:buster
+    steps:
+
+    - name: checkout
+      run: |
+        git clone https://github.com/$GITHUB_REPOSITORY /go/src/$GITHUB_REPOSITORY
+        cd /go/src/$GITHUB_REPOSITORY
+        git checkout $GITHUB_REF
+        
+    - name: Get dependencies
+      run: |
+        cd /go/src/$GITHUB_REPOSITORY
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+          go get github.com/golang/dep/cmd/dep
+          go build github.com/golang/dep/cmd/dep
+          dep ensure
+        fi
+
+    - name: unit tests
+      run: |
+        cd /go/src/$GITHUB_REPOSITORY
+        echo "" > coverage.txt
+        sh test.sh
+    
+    - name: code coverage
+      if: github.ref == 'refs/heads/master'
+      run: |
+        cd /go/src/$GITHUB_REPOSITORY
+        curl -s https://codecov.io/bash | bash
