@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/golang/snappy"
@@ -33,6 +34,10 @@ func query2CSV(cfg QueryConfig) (csvBytes []byte, newCriteria []Criterion, err e
 		record, err := sqlRow2String(cfg.Schema, sqlFields)
 		if err != nil {
 			return nil, nil, err
+		}
+		for fieldName := range record {
+			record[fieldName] = strings.ReplaceAll(record[fieldName], "\n", "U+240A")
+			record[fieldName] = strings.ReplaceAll(record[fieldName], "\r", "U+240D")
 		}
 		records = append(records, record)
 	}

@@ -7,18 +7,18 @@ import (
 )
 
 // Query -
-func Query(cfg QueryConfig) (avroBytes []byte, newCriteria []Criterion, err error) {
+func Query(cfg QueryConfig) (resultBytes []byte, newCriteria []Criterion, err error) {
 	err = cfg.Verify()
 	if err != nil {
 		return nil, nil, err
 	}
 	switch cfg.Output {
 	case outputAVRO, "":
-		avroBytes, newCriteria, err = query2AVRO(cfg)
+		resultBytes, newCriteria, err = query2AVRO(cfg)
 	case outputCSV:
-		avroBytes, newCriteria, err = query2CSV(cfg)
+		resultBytes, newCriteria, err = query2CSV(cfg)
 	}
-	return avroBytes, newCriteria, err
+	return resultBytes, newCriteria, err
 }
 
 var noRune rune
