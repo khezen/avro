@@ -36,8 +36,8 @@ func query2CSV(cfg QueryConfig) (csvBytes []byte, newCriteria []Criterion, err e
 			return nil, nil, err
 		}
 		for fieldName := range record {
-			record[fieldName] = strings.ReplaceAll(record[fieldName], "\n", "U+240A")
-			record[fieldName] = strings.ReplaceAll(record[fieldName], "\r", "U+240D")
+			record[fieldName] = strings.ReplaceAll(record[fieldName], "\n", "\\n")
+			record[fieldName] = strings.ReplaceAll(record[fieldName], "\r", "\\r")
 		}
 		records = append(records, record)
 	}
