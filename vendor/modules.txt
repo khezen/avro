@@ -1,0 +1,13 @@
+# github.com/DATA-DOG/go-sqlmock v1.4.1
+## explicit
+github.com/DATA-DOG/go-sqlmock
+# github.com/golang/snappy v0.0.1
+## explicit
+github.com/golang/snappy
+# github.com/linkedin/goavro/v2 v2.9.7
+## explicit
+github.com/linkedin/goavro/v2
+# github.com/valyala/fastjson v1.5.0
+## explicit
+github.com/valyala/fastjson
+github.com/valyala/fastjson/fastfloat

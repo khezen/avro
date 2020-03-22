@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/khezen/avro"
-	"github.com/linkedin/goavro"
+	"github.com/linkedin/goavro/v2"
 )
 
 func query2AVRO(cfg QueryConfig) (avroBytes []byte, newCriteria []Criterion, err error) {
