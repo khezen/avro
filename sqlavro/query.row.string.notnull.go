@@ -1,6 +1,8 @@
 package sqlavro
 
 import (
+	"bytes"
+	"fmt"
 	"strconv"
 
 	"github.com/khezen/avro"
@@ -25,7 +27,7 @@ func sql2StringFieldNotNull(schema avro.Schema, sqlField interface{}) (string, e
 	case avro.TypeString:
 		return *sqlField.(*string), nil
 	case avro.TypeBytes, avro.TypeFixed:
-		return string(*sqlField.(*[]byte)), nil
+		return bytesString(*sqlField.(*[]byte)), nil
 	case avro.Type(avro.LogicalTypeDecimal):
 		return sql2StringDecimal(sqlField)
 	}
@@ -47,4 +49,13 @@ func sql2StringDate(sqlField interface{}) (string, error) {
 func sql2StringDecimal(sqlField interface{}) (string, error) {
 	field := *sqlField.(*[]byte)
 	return string(field), nil
+}
+
+func bytesString(raw []byte) string {
+	bytesBuf := bytes.NewBuffer([]byte{})
+	for _, bit := range raw {
+
+		bytesBuf.WriteString(fmt.Sprintf("%x", bit))
+	}
+	return bytesBuf.String()
 }

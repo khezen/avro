@@ -65,7 +65,7 @@ func sql2StringStringNullable(sqlField interface{}) string {
 
 func sql2StringBytesNFixedNullable(schema avro.Schema, sqlField interface{}) string {
 	field := *sqlField.(*[]byte)
-	return string(field)
+	return bytesString(field)
 }
 
 func sql2StringDateNullable(sqlField interface{}) string {

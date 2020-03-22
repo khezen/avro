@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/golang/snappy"
@@ -34,6 +35,10 @@ func query2CSV(cfg QueryConfig) (csvBytes []byte, newCriteria []Criterion, err e
 		if err != nil {
 			return nil, nil, err
 		}
+		for fieldName := range record {
+			record[fieldName] = strings.ReplaceAll(record[fieldName], "\n", "\\n")
+			record[fieldName] = strings.ReplaceAll(record[fieldName], "\r", "\\r")
+		}
 		records = append(records, record)
 	}
 	return strings2CSV(cfg, records)
@@ -57,7 +62,7 @@ func strings2CSV(cfg QueryConfig, records []map[string]string) (csvBytes []byte,
 	)
 	for i = 0; i < fieldsLen-1; i++ {
 		buf.WriteString(cfg.Schema.Fields[i].Name)
-		buf.WriteRune(',')
+		buf.WriteRune(cfg.Separator)
 	}
 	buf.WriteString(cfg.Schema.Fields[fieldsLen-1].Name)
 	buf.WriteRune('\n')
