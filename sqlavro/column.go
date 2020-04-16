@@ -15,7 +15,7 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 	if err != nil {
 		return nil, err
 	}
-	if defaultValue != nil && len(defaultValue) > 0 {
+	if len(defaultValue) > 0 {
 		defaultValue = sqlDefault2AVRODefault(dataType, defaultValue)
 	}
 	if isNullable {
@@ -26,7 +26,7 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 		}
 	}
 	var rawDefault *json.RawMessage
-	if defaultValue != nil && len(defaultValue) > 0 {
+	if len(defaultValue) > 0 {
 		rawDefault = new(json.RawMessage)
 		*rawDefault = defaultValue
 	}
