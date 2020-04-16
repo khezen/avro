@@ -111,10 +111,8 @@ func sqlDefault2AVRODefault(dataType SQLType, sqlDefaultValue []byte) (avroDefau
 		switch dataType {
 		case Date:
 			format = "2006-01-02"
-			break
 		case Time:
 			format = "15:04:05"
-			break
 		case DateTime, Timestamp:
 			format = "2006-01-02 15:04:05"
 		}

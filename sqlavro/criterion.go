@@ -96,16 +96,12 @@ func (c *Criterion) setLimitFromNative(limit interface{}) error {
 		switch typeName {
 		case avro.Type(avro.LogicalTypeTimestamp), avro.Type(avro.LogicalTypeTime):
 			primitiveType = string(avro.TypeInt32)
-			break
 		case avro.Type(avro.LogicalTypeDate):
 			primitiveType = "int.date"
-			break
 		case avro.Type(avro.LogicalTypeDecimal):
 			primitiveType = "bytes.decimal"
-			break
 		default:
 			primitiveType = string(typeName)
-			break
 		}
 		limit = limit.(map[string]interface{})[primitiveType]
 	} else {
