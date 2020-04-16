@@ -92,10 +92,8 @@ func strings2CSV(cfg QueryConfig, records []map[string]string) (csvBytes []byte,
 			return nil, nil, err
 		}
 		csvBytes = buf.Bytes()
-		break
 	case avro.CompressionSnappy:
 		csvBytes = snappy.Encode(nil, csvBytes)
-		break
 	}
 	return csvBytes, newCriteria, nil
 }
