@@ -11,10 +11,7 @@ import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/khezen/avro"
 	"github.com/linkedin/goavro/v2"
-	"github.com/valyala/fastjson"
 )
-
-var unmarshaller fastjson.Parser
 
 func TestQuery2AVRO(t *testing.T) {
 	db, mock, err := sqlmock.New()

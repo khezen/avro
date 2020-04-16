@@ -45,13 +45,10 @@ func TestCriterion(t *testing.T) {
 		switch c.Type {
 		case avro.TypeInt64:
 			criterion = NewCriterionInt64(c.fieldName, c.limit.(*int64), c.order)
-			break
 		case avro.TypeFloat64:
 			criterion = NewCriterionFloat64(c.fieldName, c.limit.(*float64), c.order)
-			break
 		case avro.TypeString:
 			criterion = NewCriterionString(c.fieldName, c.limit.(*string), c.order)
-			break
 		case avro.Type(avro.LogicalTypeDate):
 			criterion = NewCriterionDate(c.fieldName, c.limit.(*time.Time), c.order)
 		case avro.Type(avro.LogicalTypeTimestamp):
@@ -60,7 +57,6 @@ func TestCriterion(t *testing.T) {
 			criterion = NewCriterionTime(c.fieldName, c.limit.(*time.Time), c.order)
 		default:
 			t.Errorf("unsupported type")
-			break
 		}
 		limit, err := criterion.Limit()
 		if err != c.expectedLimitErr {

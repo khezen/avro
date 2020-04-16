@@ -15,7 +15,7 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 	if err != nil {
 		return nil, err
 	}
-	if defaultValue != nil && len(defaultValue) > 0 {
+	if len(defaultValue) > 0 {
 		defaultValue = sqlDefault2AVRODefault(dataType, defaultValue)
 	}
 	if isNullable {
@@ -26,7 +26,7 @@ func sqlColumn2AVRO(columnName string, dataType SQLType, isNullable bool, defaul
 		}
 	}
 	var rawDefault *json.RawMessage
-	if defaultValue != nil && len(defaultValue) > 0 {
+	if len(defaultValue) > 0 {
 		rawDefault = new(json.RawMessage)
 		*rawDefault = defaultValue
 	}
@@ -111,10 +111,8 @@ func sqlDefault2AVRODefault(dataType SQLType, sqlDefaultValue []byte) (avroDefau
 		switch dataType {
 		case Date:
 			format = "2006-01-02"
-			break
 		case Time:
 			format = "15:04:05"
-			break
 		case DateTime, Timestamp:
 			format = "2006-01-02 15:04:05"
 		}

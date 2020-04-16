@@ -1,0 +1,50 @@
+name: checks
+on: 
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - 'master'
+jobs:
+
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    container: 
+      image: khezen/goci
+    env:
+      WORKDIR: /go/src/github.com/khezen/avro
+    steps:
+
+    - name: checkout
+      run: |
+       set -e
+          mkdir -p $WORKDIR
+          git clone -n --depth=1 --no-single-branch https://khezen:${{ secrets.GITHUB_TOKEN }}@github.com/khezen/avro $WORKDIR
+          cd $WORKDIR
+          git fetch --depth=1 origin $GITHUB_SHA
+          git checkout FETCH_HEAD
+    
+    - name: linter
+      if: github.event_name == 'pull_request'
+      working-directory: ${{ env.WORKDIR }}
+      run: |
+        LINTER=$LINTER$( { golangci-lint run --modules-download-mode vendor || true; } 2>&1 );
+        if [ ${#LINTER} -eq 0 ]; then
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} cmtpr "**Linter:** :heavy_check_mark:"
+        else
+          LINTER_FMT=$( printf "%s\n" "**Linter:** :x:" "\`\`\`sh" "$LINTER" "\`\`\`" )
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} cmtpr "$LINTER_FMT"
+        fi
+
+    - name: unit tests
+      working-directory: ${{ env.WORKDIR }}
+      run: |
+        echo "" > coverage.txt
+        sh test.sh
+    
+    - name: code coverage
+      if: github.ref == 'refs/heads/master'
+      working-directory: ${{ env.WORKDIR }}
+      run: curl -s https://codecov.io/bash | bash

@@ -47,26 +47,21 @@ func CreateTableStatement(cfg CreateConfig) (string, error) {
 	switch {
 	case cfg.DistStyle == DistStyleAll:
 		buf.WriteString(" DISTSTYLE ALL")
-		break
 	case cfg.DistStyle == DistStyleEven:
 		buf.WriteString(" DISTSTYLE EVEN")
-		break
 	case cfg.DistStyle == DistStyleAuto:
 		buf.WriteString(" DISTSTYLE AUTO")
-		break
 	case cfg.DistStyle == DistStyleKey && cfg.DistKey != nil:
 		buf.WriteString(" DISTSTYLE KEY")
 		buf.WriteString(" DISTKEY(")
 		buf.WriteString(*cfg.DistKey)
 		buf.WriteString(") ")
-		break
 	case cfg.DistStyle == "":
 		if cfg.DistKey != nil {
 			buf.WriteString(" DISTKEY(")
 			buf.WriteString(*cfg.DistKey)
 			buf.WriteString(") ")
 		}
-		break
 	default:
 		return "", ErrUnuspportedDistributionStyle
 	}
