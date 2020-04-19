@@ -106,7 +106,7 @@ func sqlDefault2AVRODefault(dataType SQLType, sqlDefaultValue []byte) (avroDefau
 		Text, TinyText, MediumText, LongText,
 		Enum, Set:
 		return []byte(fmt.Sprintf(`"%s"`, string(sqlDefaultValue)))
-	case Date, Time, DateTime:
+	case Date, Time, DateTime, Timestamp:
 		var format string
 		switch dataType {
 		case Date:
