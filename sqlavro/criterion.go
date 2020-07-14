@@ -76,7 +76,8 @@ func (c *Criterion) limit(schema avro.Schema) (interface{}, error) {
 	}
 }
 
-func (c *Criterion) setLimitFromNative(limit interface{}) error {
+// SetLimit - from native go
+func (c *Criterion) SetLimit(limit interface{}) error {
 	if limit == nil {
 		return nil
 	}

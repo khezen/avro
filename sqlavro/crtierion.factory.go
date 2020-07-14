@@ -20,7 +20,7 @@ func NewCriterionFromNative(field *avro.RecordFieldSchema, value interface{}, or
 		criterion.FieldName = field.Name
 	}
 	criterion.setSchema(*field)
-	err := criterion.setLimitFromNative(value)
+	err := criterion.SetLimit(value)
 	if err != nil {
 		return nil, err
 	}
