@@ -104,7 +104,9 @@ func (c *Criterion) SetLimit(limit interface{}) error {
 		default:
 			primitiveType = string(typeName)
 		}
-		limit = limit.(map[string]interface{})[primitiveType]
+		if limitUnion, ok := limit.(map[string]interface{}); ok {
+			limit = limitUnion[primitiveType]
+		}
 	} else {
 		schema = c.fieldSchema.Type
 	}
