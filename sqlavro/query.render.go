@@ -14,7 +14,7 @@ func renderQuery(dbName string, schema *avro.RecordSchema, limit int, criteria [
 	var criteriaLen int
 	if criteria != nil {
 		criteriaLen = len(criteria)
-		err = ensureCriterionTypes(schema, criteria)
+		err = EnsureCriterionTypes(schema, criteria)
 		if err != nil {
 			return "", nil, err
 		}

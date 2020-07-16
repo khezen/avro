@@ -4,7 +4,8 @@ import (
 	"github.com/khezen/avro"
 )
 
-func ensureCriterionTypes(schema *avro.RecordSchema, criteria []Criterion) (err error) {
+// EnsureCriterionTypes - search the given schema to find & set criteria types
+func EnsureCriterionTypes(schema *avro.RecordSchema, criteria []Criterion) (err error) {
 	var (
 		i     int
 		match bool
