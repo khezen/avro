@@ -182,7 +182,8 @@ func rawLimit2Native(schema avro.Schema, limit interface{}) (json.RawMessage, er
 	case avro.TypeString:
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, limit.(string)))
 		return rawLimit, nil
-	case avro.Type(avro.LogicalTypeTimestamp):
+	case avro.Type(avro.LogicalTypeTimestamp),
+		avro.Type(avro.LogicalTypeTime):
 		var t time.Time
 		var ok bool
 		if t, ok = limit.(time.Time); !ok {
@@ -191,16 +192,12 @@ func rawLimit2Native(schema avro.Schema, limit interface{}) (json.RawMessage, er
 		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
 		return rawLimit, nil
 	case avro.Type(avro.LogicalTypeDate):
-		t := limit.(time.Time)
-		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(SQLDateFormat)))
-		return rawLimit, nil
-	case avro.Type(avro.LogicalTypeTime):
 		var t time.Time
 		var ok bool
 		if t, ok = limit.(time.Time); !ok {
 			t = time.Date(1970, 1, 1, 0, 0, int(limit.(int32)), 0, time.UTC)
 		}
-		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(time.RFC3339Nano)))
+		rawLimit = json.RawMessage(fmt.Sprintf(`"%s"`, t.Format(SQLDateFormat)))
 		return rawLimit, nil
 	default:
 		return nil, ErrUnsupportedTypeForCriterion
