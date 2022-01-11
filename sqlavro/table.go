@@ -11,10 +11,21 @@ import (
 // SQLTable2AVRO - translate the given SQL table to AVRO schema
 func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, error) {
 	qBuf := bytes.NewBufferString(`
-		 SELECT TABLE_SCHEMA,COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_MAXIMUM_LENGTH
-		 FROM INFORMATION_SCHEMA.COLUMNS 
-		 WHERE TABLE_NAME=?
-	`)
+		 SELECT 
+		 	TABLE_SCHEMA,
+			 COLUMN_NAME,
+			 DATA_TYPE,
+			 IS_NULLABLE,
+			 COLUMN_DEFAULT,
+			 NUMERIC_PRECISION,
+			 NUMERIC_SCALE,
+			 CHARACTER_MAXIMUM_LENGTH
+		 FROM 
+		 	INFORMATION_SCHEMA.COLUMNS 
+		 WHERE 
+		 	TABLE_NAME=?
+		 ORDER BY ORDINAL_POSITION ASC`,
+	)
 	params := make([]interface{}, 0, 2)
 	params = append(params, tableName)
 	if len(dbName) > 0 {
