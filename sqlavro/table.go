@@ -23,8 +23,7 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 		 FROM 
 		 	INFORMATION_SCHEMA.COLUMNS 
 		 WHERE 
-		 	TABLE_NAME=?
-		 ORDER BY ORDINAL_POSITION ASC`,
+		 	TABLE_NAME=?`,
 	)
 	params := make([]interface{}, 0, 2)
 	params = append(params, tableName)
@@ -32,6 +31,7 @@ func SQLTable2AVRO(db *sql.DB, dbName, tableName string) (*avro.RecordSchema, er
 		qBuf.WriteString(` AND TABLE_SCHEMA=?`)
 		params = append(params, dbName)
 	}
+	qBuf.WriteString(` ORDER BY ORDINAL_POSITION ASC`)
 	rows, err := db.Query(
 		qBuf.String(),
 		params...,
