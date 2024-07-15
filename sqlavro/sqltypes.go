@@ -31,6 +31,8 @@ const (
 	MediumBlob SQLType = "mediumblob"
 	// LongBlob -
 	LongBlob SQLType = "longblob"
+	// JSON
+	JSON SQLType = "json"
 	// Enum -
 	Enum SQLType = "enum"
 	// Set -
