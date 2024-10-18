@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/apache/arrow/go/v14/arrow"
 	"github.com/apache/arrow/go/v14/arrow/array"
@@ -154,7 +155,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 	switch avroField.TypeName() {
 	case avro.TypeBoolean:
 		for i := range records {
-			if records[i] == nil {
+			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.BooleanBuilder).Append(records[i].(bool))
@@ -162,7 +163,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		}
 	case avro.TypeInt32, avro.TypeInt64:
 		for i := range records {
-			if records[i] == nil {
+			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.Int32Builder).Append(records[i].(int32))
@@ -170,7 +171,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		}
 	case avro.TypeFloat32:
 		for i := range records {
-			if records[i] == nil {
+			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.Float32Builder).Append(records[i].(float32))
@@ -178,7 +179,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		}
 	case avro.TypeFloat64:
 		for i := range records {
-			if records[i] == nil {
+			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.Float64Builder).Append(records[i].(float64))
@@ -186,7 +187,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		}
 	case avro.TypeString, avro.TypeEnum:
 		for i := range records {
-			if records[i] == nil {
+			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.StringBuilder).Append(records[i].(string))
@@ -194,7 +195,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		}
 	case avro.TypeBytes:
 		for i := range records {
-			if records[i] == nil {
+			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.BinaryBuilder).Append(records[i].([]byte))
@@ -202,7 +203,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		}
 	case avro.TypeFixed:
 		for i := range records {
-			if records[i] == nil {
+			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.FixedSizeBinaryBuilder).Append(records[i].([]byte))
@@ -225,4 +226,16 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		err = fmt.Errorf("unsupported type %s", avroField.TypeName())
 	}
 	return err
+}
+
+func isNil(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+	v := reflect.ValueOf(i)
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Slice, reflect.Map, reflect.Chan, reflect.Interface, reflect.Func:
+		return v.IsNil()
+	}
+	return false
 }
