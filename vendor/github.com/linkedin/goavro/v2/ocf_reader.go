@@ -17,7 +17,6 @@ import (
 	"fmt"
 	"hash/crc32"
 	"io"
-	"io/ioutil"
 
 	"github.com/golang/snappy"
 )
@@ -35,23 +34,23 @@ type OCFReader struct {
 // NewOCFReader initializes and returns a new structure used to read an Avro
 // Object Container File (OCF).
 //
-//     func example(ior io.Reader) error {
-//         // NOTE: Wrap provided io.Reader in a buffered reader, which improves the
-//         // performance of streaming file data.
-//         br := bufio.NewReader(ior)
-//         ocfr, err := goavro.NewOCFReader(br)
-//         if err != nil {
-//             return err
-//         }
-//         for ocfr.Scan() {
-//             datum, err := ocfr.Read()
-//             if err != nil {
-//                 return err
-//             }
-//             fmt.Println(datum)
-//         }
-//         return ocfr.Err()
-//     }
+//	func example(ior io.Reader) error {
+//	    // NOTE: Wrap provided io.Reader in a buffered reader, which improves the
+//	    // performance of streaming file data.
+//	    br := bufio.NewReader(ior)
+//	    ocfr, err := goavro.NewOCFReader(br)
+//	    if err != nil {
+//	        return err
+//	    }
+//	    for ocfr.Scan() {
+//	        datum, err := ocfr.Read()
+//	        if err != nil {
+//	            return err
+//	        }
+//	        fmt.Println(datum)
+//	    }
+//	    return ocfr.Err()
+//	}
 func NewOCFReader(ior io.Reader) (*OCFReader, error) {
 	header, err := readOCFHeader(ior)
 	if err != nil {
@@ -60,7 +59,7 @@ func NewOCFReader(ior io.Reader) (*OCFReader, error) {
 	return &OCFReader{header: header, ior: ior}, nil
 }
 
-//MetaData returns the file metadata map found within the OCF file
+// MetaData returns the file metadata map found within the OCF file
 func (ocfr *OCFReader) MetaData() map[string][]byte {
 	return ocfr.header.metadata
 }
@@ -192,7 +191,7 @@ func (ocfr *OCFReader) Scan() bool {
 			// NOTE: flate.NewReader wraps with io.ByteReader if argument does
 			// not implement that interface.
 			rc := flate.NewReader(bytes.NewBuffer(ocfr.block))
-			ocfr.block, ocfr.rerr = ioutil.ReadAll(rc)
+			ocfr.block, ocfr.rerr = io.ReadAll(rc)
 			if ocfr.rerr != nil {
 				_ = rc.Close()
 				return false

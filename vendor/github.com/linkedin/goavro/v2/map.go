@@ -17,13 +17,13 @@ import (
 	"reflect"
 )
 
-func makeMapCodec(st map[string]*Codec, namespace string, schemaMap map[string]interface{}) (*Codec, error) {
+func makeMapCodec(st map[string]*Codec, namespace string, schemaMap map[string]interface{}, cb *codecBuilder) (*Codec, error) {
 	// map type must have values
 	valueSchema, ok := schemaMap["values"]
 	if !ok {
 		return nil, errors.New("Map ought to have values key")
 	}
-	valueCodec, err := buildCodec(st, namespace, valueSchema)
+	valueCodec, err := buildCodec(st, namespace, valueSchema, cb)
 	if err != nil {
 		return nil, fmt.Errorf("Map values ought to be valid Avro type: %s", err)
 	}
@@ -204,7 +204,7 @@ func genericMapTextDecoder(buf []byte, defaultCodec *Codec, codecFromKey map[str
 		}
 		value, buf, err = fieldCodec.nativeFromTextual(buf)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("%s for key: %q", err, key)
 		}
 		// set map value for key
 		mapValues[key] = value
@@ -301,7 +301,7 @@ func convertMap(datum interface{}) (map[string]interface{}, error) {
 			// bail when map key type is not string
 			return nil, fmt.Errorf("cannot create map[string]interface{}: expected map[string]...; received: %T", datum)
 		}
-		mapValues[string(k)] = v.MapIndex(key).Interface()
+		mapValues[k] = v.MapIndex(key).Interface()
 	}
 	return mapValues, nil
 }

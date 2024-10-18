@@ -32,7 +32,7 @@ func (p *Parser) Parse(s string) (*Value, error) {
 	p.b = append(p.b[:0], s...)
 	p.c.reset()
 
-	v, tail, err := parseValue(b2s(p.b), &p.c)
+	v, tail, err := parseValue(b2s(p.b), &p.c, 0)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse JSON: %s; unparsed tail: %q", err, startEndString(tail))
 	}
@@ -95,20 +95,27 @@ type kv struct {
 	v *Value
 }
 
-func parseValue(s string, c *cache) (*Value, string, error) {
+// MaxDepth is the maximum depth for nested JSON.
+const MaxDepth = 300
+
+func parseValue(s string, c *cache, depth int) (*Value, string, error) {
 	if len(s) == 0 {
 		return nil, s, fmt.Errorf("cannot parse empty string")
 	}
+	depth++
+	if depth > MaxDepth {
+		return nil, s, fmt.Errorf("too big depth for the nested JSON; it exceeds %d", MaxDepth)
+	}
 
 	if s[0] == '{' {
-		v, tail, err := parseObject(s[1:], c)
+		v, tail, err := parseObject(s[1:], c, depth)
 		if err != nil {
 			return nil, tail, fmt.Errorf("cannot parse object: %s", err)
 		}
 		return v, tail, nil
 	}
 	if s[0] == '[' {
-		v, tail, err := parseArray(s[1:], c)
+		v, tail, err := parseArray(s[1:], c, depth)
 		if err != nil {
 			return nil, tail, fmt.Errorf("cannot parse array: %s", err)
 		}
@@ -160,7 +167,7 @@ func parseValue(s string, c *cache) (*Value, string, error) {
 	return v, tail, nil
 }
 
-func parseArray(s string, c *cache) (*Value, string, error) {
+func parseArray(s string, c *cache, depth int) (*Value, string, error) {
 	s = skipWS(s)
 	if len(s) == 0 {
 		return nil, s, fmt.Errorf("missing ']'")
@@ -181,7 +188,7 @@ func parseArray(s string, c *cache) (*Value, string, error) {
 		var err error
 
 		s = skipWS(s)
-		v, s, err = parseValue(s, c)
+		v, s, err = parseValue(s, c, depth)
 		if err != nil {
 			return nil, s, fmt.Errorf("cannot parse array value: %s", err)
 		}
@@ -203,7 +210,7 @@ func parseArray(s string, c *cache) (*Value, string, error) {
 	}
 }
 
-func parseObject(s string, c *cache) (*Value, string, error) {
+func parseObject(s string, c *cache, depth int) (*Value, string, error) {
 	s = skipWS(s)
 	if len(s) == 0 {
 		return nil, s, fmt.Errorf("missing '}'")
@@ -240,7 +247,7 @@ func parseObject(s string, c *cache) (*Value, string, error) {
 
 		// Parse value
 		s = skipWS(s)
-		kv.v, s, err = parseValue(s, c)
+		kv.v, s, err = parseValue(s, c, depth)
 		if err != nil {
 			return nil, s, fmt.Errorf("cannot parse object value: %s", err)
 		}
@@ -890,8 +897,7 @@ func (v *Value) Float64() (float64, error) {
 	if v.Type() != TypeNumber {
 		return 0, fmt.Errorf("value doesn't contain number; it contains %s", v.Type())
 	}
-	f := fastfloat.ParseBestEffort(v.s)
-	return f, nil
+	return fastfloat.Parse(v.s)
 }
 
 // Int returns the underlying JSON int for the v.
@@ -901,9 +907,9 @@ func (v *Value) Int() (int, error) {
 	if v.Type() != TypeNumber {
 		return 0, fmt.Errorf("value doesn't contain number; it contains %s", v.Type())
 	}
-	n := fastfloat.ParseInt64BestEffort(v.s)
-	if n == 0 && v.s != "0" {
-		return 0, fmt.Errorf("cannot parse int %q", v.s)
+	n, err := fastfloat.ParseInt64(v.s)
+	if err != nil {
+		return 0, err
 	}
 	nn := int(n)
 	if int64(nn) != n {
@@ -919,9 +925,9 @@ func (v *Value) Uint() (uint, error) {
 	if v.Type() != TypeNumber {
 		return 0, fmt.Errorf("value doesn't contain number; it contains %s", v.Type())
 	}
-	n := fastfloat.ParseUint64BestEffort(v.s)
-	if n == 0 && v.s != "0" {
-		return 0, fmt.Errorf("cannot parse uint %q", v.s)
+	n, err := fastfloat.ParseUint64(v.s)
+	if err != nil {
+		return 0, err
 	}
 	nn := uint(n)
 	if uint64(nn) != n {
@@ -937,11 +943,7 @@ func (v *Value) Int64() (int64, error) {
 	if v.Type() != TypeNumber {
 		return 0, fmt.Errorf("value doesn't contain number; it contains %s", v.Type())
 	}
-	n := fastfloat.ParseInt64BestEffort(v.s)
-	if n == 0 && v.s != "0" {
-		return 0, fmt.Errorf("cannot parse int64 %q", v.s)
-	}
-	return n, nil
+	return fastfloat.ParseInt64(v.s)
 }
 
 // Uint64 returns the underlying JSON uint64 for the v.
@@ -951,11 +953,7 @@ func (v *Value) Uint64() (uint64, error) {
 	if v.Type() != TypeNumber {
 		return 0, fmt.Errorf("value doesn't contain number; it contains %s", v.Type())
 	}
-	n := fastfloat.ParseUint64BestEffort(v.s)
-	if n == 0 && v.s != "0" {
-		return 0, fmt.Errorf("cannot parse uint64 %q", v.s)
-	}
-	return n, nil
+	return fastfloat.ParseUint64(v.s)
 }
 
 // Bool returns the underlying JSON bool for the v.

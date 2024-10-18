@@ -75,6 +75,7 @@ func newName(n, ns, ens string) (*name, error) {
 		nn.namespace = n[:index]
 	} else {
 		// inputName does not contain a dot, therefore is not the full name
+		// nolint:gocritic
 		if ns != nullNamespace {
 			// if namespace provided in the schema in the same schema level, use it
 			nn.fullName = ns + "." + n
@@ -139,4 +140,10 @@ func (n *name) short() string {
 		return n.fullName[index+1:]
 	}
 	return n.fullName
+}
+
+// Shortname returns the name without the prefixed namespace.
+// This uses the short method underneath but is visible outside the package.
+func (n *name) ShortName() string {
+	return n.short()
 }
