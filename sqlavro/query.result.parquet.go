@@ -63,7 +63,6 @@ func native2parquet(cfg QueryConfig, records [][]interface{}) (parquetBytes []by
 	if err != nil {
 		return nil, nil, err
 	}
-
 	return parquetBytes, nil, nil
 
 }
