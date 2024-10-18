@@ -46,16 +46,25 @@ func query2Parquet(cfg QueryConfig) (parquetBytes []byte, newCriteria []Criterio
 }
 
 func native2parquet(cfg QueryConfig, records [][]interface{}) (parquetBytes []byte, newCriteria []Criterion, err error) {
+	// recordsLen := len(records)
+	// if recordsLen > 0 && cfg.Criteria != nil {
+	// 	newCriteria, err = criteriaFromNative(cfg.Schema, records[recordsLen-1], cfg.Criteria)
+	// 	if err != nil {
+	// 		return nil, nil, err
+	// 	}
+	// } else {
+	// 	newCriteria = cfg.Criteria
+	// }
 	arrowSchema, err := avroSchema2arrowSchema(cfg.Schema)
 	if err != nil {
 		return nil, nil, err
 	}
-	err = nativeRecordToArrowRecord(cfg.Schema, arrowSchema, records)
+	parquetBytes, err = nativeRecordToArrowRecord(cfg.Schema, arrowSchema, records)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return nil, nil, nil
+	return parquetBytes, nil, nil
 
 }
 
@@ -108,14 +117,14 @@ func avroField2arrowField(name string, field avro.Schema) (node arrow.Field, err
 	return
 }
 
-func nativeRecordToArrowRecord(avroSchema *avro.RecordSchema, arrowSchema *arrow.Schema, records [][]interface{}) error {
+func nativeRecordToArrowRecord(avroSchema *avro.RecordSchema, arrowSchema *arrow.Schema, records [][]interface{}) (parquetBytes []byte, err error) {
 	pool := memory.NewGoAllocator()
 	builder := array.NewRecordBuilder(pool, arrowSchema)
 	defer builder.Release()
 	for i := range records {
 		err := nativeField2arrowField(avroSchema.Fields[i].Type, builder.Fields()[i], records[i])
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	record := builder.NewRecord()
@@ -133,13 +142,13 @@ func nativeRecordToArrowRecord(avroSchema *avro.RecordSchema, arrowSchema *arrow
 	defer pw.Close()
 	err = pw.Write(record)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = pw.Close()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return buf.Bytes(), nil
 }
 
 func nativeField2arrowField(avroField avro.Schema, builder array.Builder, records []interface{}) (err error) {
