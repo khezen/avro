@@ -26,6 +26,7 @@ func query2Parquet(cfg QueryConfig) (parquetBytes []byte, newCriteria []Criterio
 	for _ = range cfg.Schema.Fields {
 		records = append(records, make([]interface{}, 0, cfg.Limit))
 	}
+	var latestRecord map[string]interface{}
 	for rows.Next() {
 		sqlFields, err := renderSQLFields(cfg.Schema)
 		if err != nil {
@@ -35,27 +36,27 @@ func query2Parquet(cfg QueryConfig) (parquetBytes []byte, newCriteria []Criterio
 		if err != nil {
 			return nil, nil, err
 		}
-		record, err := sqlRow2native(cfg.Schema, sqlFields)
+		latestRecord, err = sqlRow2native(cfg.Schema, sqlFields)
 		if err != nil {
 			return nil, nil, err
 		}
 		for i, field := range cfg.Schema.Fields {
-			records[i] = append(records[i], record[field.Name])
+			records[i] = append(records[i], latestRecord[field.Name])
 		}
 	}
-	return native2parquet(cfg, records)
+	return native2parquet(cfg, records, latestRecord)
 }
 
-func native2parquet(cfg QueryConfig, records [][]interface{}) (parquetBytes []byte, newCriteria []Criterion, err error) {
-	// recordsLen := len(records)
-	// if recordsLen > 0 && cfg.Criteria != nil {
-	// 	newCriteria, err = criteriaFromNative(cfg.Schema, records[recordsLen-1], cfg.Criteria)
-	// 	if err != nil {
-	// 		return nil, nil, err
-	// 	}
-	// } else {
-	// 	newCriteria = cfg.Criteria
-	// }
+func native2parquet(cfg QueryConfig, records [][]interface{}, latestRecord map[string]interface{}) (parquetBytes []byte, newCriteria []Criterion, err error) {
+	recordsLen := len(records)
+	if recordsLen > 0 && cfg.Criteria != nil {
+		newCriteria, err = criteriaFromNative(cfg.Schema, latestRecord, cfg.Criteria)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		newCriteria = cfg.Criteria
+	}
 	arrowSchema, err := avroSchema2arrowSchema(cfg.Schema)
 	if err != nil {
 		return nil, nil, err
@@ -64,7 +65,7 @@ func native2parquet(cfg QueryConfig, records [][]interface{}) (parquetBytes []by
 	if err != nil {
 		return nil, nil, err
 	}
-	return parquetBytes, nil, nil
+	return parquetBytes, newCriteria, nil
 
 }
 
