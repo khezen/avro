@@ -13,10 +13,12 @@ func Query(cfg QueryConfig) (resultBytes []byte, newCriteria []Criterion, err er
 		return nil, nil, err
 	}
 	switch cfg.Output {
-	case outputAVRO, "":
+	case OutputAVRO, "":
 		resultBytes, newCriteria, err = query2AVRO(cfg)
-	case outputCSV:
+	case OutputCSV:
 		resultBytes, newCriteria, err = query2CSV(cfg)
+	case OutputParquet:
+		resultBytes, newCriteria, err = query2Parquet(cfg)
 	}
 	return resultBytes, newCriteria, err
 }
@@ -65,9 +67,9 @@ func (qc *QueryConfig) Verify() error {
 		return avro.ErrUnsupportedCompression
 	}
 	if qc.Output == "" {
-		qc.Output = outputAVRO
+		qc.Output = OutputAVRO
 	}
-	if qc.Output != "" && qc.Output != outputAVRO && qc.Output != outputCSV {
+	if qc.Output != "" && qc.Output != OutputAVRO && qc.Output != OutputCSV && qc.Output != OutputParquet {
 		return ErrUnsupportedOutput
 	}
 	if qc.Separator == noRune {
@@ -77,6 +79,7 @@ func (qc *QueryConfig) Verify() error {
 }
 
 var (
-	outputAVRO = "avro"
-	outputCSV  = "csv"
+	OutputAVRO    = "avro"
+	OutputCSV     = "csv"
+	OutputParquet = "parquet"
 )

@@ -1,4 +1,4 @@
-package sqlavro
+package sqlavro_test
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/khezen/avro/sqlavro"
 )
 
 func TestQuery2CSV(t *testing.T) {
@@ -74,7 +75,7 @@ func TestQuery2CSV(t *testing.T) {
 		`SELECT TABLE_SCHEMA,COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_MAXIMUM_LENGTH
 		FROM INFORMATION_SCHEMA.COLUMNS (.+)`,
 	).WillReturnRows(mockInfoRows)
-	schemas, err := SQLDatabase2AVRO(db, "blog")
+	schemas, err := sqlavro.SQLDatabase2AVRO(db, "blog")
 	if err != nil {
 		t.Error(err)
 	}
@@ -142,12 +143,12 @@ func TestQuery2CSV(t *testing.T) {
 	dateStr := json.RawMessage(`"1970-01-01"`)
 	dateTimeStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
 	timeStampStr := json.RawMessage(`"1970-01-01T00:00:00.0Z"`)
-	csvBytes, _, err := Query(QueryConfig{
+	csvBytes, _, err := sqlavro.Query(sqlavro.QueryConfig{
 		DB:     db,
 		DBName: "blog",
 		Schema: &schemas[0],
 		Limit:  10,
-		Criteria: []Criterion{
+		Criteria: []sqlavro.Criterion{
 			{
 				FieldName: "post_date",
 				RawLimit:  &dateStr,
@@ -165,7 +166,7 @@ func TestQuery2CSV(t *testing.T) {
 				RawLimit:  nil,
 			},
 		},
-		Output: outputCSV,
+		Output: sqlavro.OutputCSV,
 	})
 	if err != nil {
 		t.Error(err)
