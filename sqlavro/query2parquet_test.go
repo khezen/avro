@@ -74,12 +74,21 @@ func TestQuery2Parquet(t *testing.T) {
 		 FROM INFORMATION_SCHEMA.TABLES(.*)`,
 	).WillReturnRows(mockedTableRows)
 	mock.ExpectQuery(
-		`SELECT TABLE_SCHEMA,COLUMN_NAME,DATA_TYPE,IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_PRECISION,NUMERIC_SCALE,CHARACTER_MAXIMUM_LENGTH
-		FROM INFORMATION_SCHEMA.COLUMNS (.+)`,
+		`SELECT 
+		 	TABLE_SCHEMA,
+			COLUMN_NAME,
+			DATA_TYPE,
+			IS_NULLABLE,
+			COLUMN_DEFAULT,
+			NUMERIC_PRECISION,
+			NUMERIC_SCALE,
+			CHARACTER_MAXIMUM_LENGTH
+		 FROM 
+		 	INFORMATION_SCHEMA.COLUMNS(.+)`,
 	).WillReturnRows(mockInfoRows)
 	schemas, err := sqlavro.SQLDatabase2AVRO(db, "blog")
 	if err != nil {
-		t.Error(err)
+		panic(err)
 	}
 	var (
 		postsColumns = []string{
@@ -171,7 +180,7 @@ func TestQuery2Parquet(t *testing.T) {
 		Output: sqlavro.OutputParquet,
 	})
 	if err != nil {
-		t.Error(err)
+		panic(err)
 	}
 	buf := bytes.NewReader(parquetBytes)
 	parquetReader, err := file.NewParquetReader(buf)

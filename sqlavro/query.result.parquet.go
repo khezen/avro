@@ -8,11 +8,13 @@ import (
 
 	"github.com/apache/arrow/go/v14/arrow"
 	"github.com/apache/arrow/go/v14/arrow/array"
+	"github.com/apache/arrow/go/v14/arrow/decimal128"
 	"github.com/apache/arrow/go/v14/arrow/memory"
 	"github.com/apache/arrow/go/v14/parquet/pqarrow"
 	"github.com/khezen/avro"
 )
 
+// TODO support compression
 func query2Parquet(cfg QueryConfig) (parquetBytes []byte, newCriteria []Criterion, err error) {
 	statement, params, err := renderQuery(cfg.DBName, cfg.Schema, cfg.Limit, cfg.Criteria)
 	if err != nil {
@@ -99,8 +101,25 @@ func avroField2arrowField(name string, field avro.Schema) (node arrow.Field, err
 	case avro.TypeFixed:
 		length := field.(*avro.FixedSchema).Size
 		node = arrow.Field{Name: name, Type: &arrow.FixedSizeBinaryType{ByteWidth: length}}
+	case avro.Type(avro.LogicalTypeDecimal):
+		decimal := field.(*avro.DerivedPrimitiveSchema)
+		node = arrow.Field{
+			Name: name,
+			Type: &arrow.Decimal128Type{
+				Precision: int32(*decimal.Precision),
+				Scale:     int32(*decimal.Scale),
+			},
+		}
+	case avro.Type(avro.LogicalTypeDate):
+		node = arrow.Field{Name: name, Type: &arrow.Date32Type{}}
+	case avro.Type(avro.LogicalTypeTime):
+		node = arrow.Field{Name: name, Type: &arrow.Time32Type{Unit: arrow.Second}}
+	case avro.Type(avro.LogicalTypeTimestamp):
+		node = arrow.Field{Name: name, Type: &arrow.TimestampType{Unit: arrow.Second, TimeZone: "UTC"}}
+	case avro.Type(avro.LogialTypeDuration):
+		node = arrow.Field{Name: name, Type: &arrow.DurationType{Unit: arrow.Millisecond}}
 	case avro.TypeUnion:
-		union := *field.(*avro.UnionSchema)
+		union := field.(avro.UnionSchema)
 		valid := false
 		for i := range union {
 			valid = union[i].TypeName() != avro.TypeNull
@@ -128,6 +147,7 @@ func nativeRecordToArrowRecord(avroSchema *avro.RecordSchema, arrowSchema *arrow
 			return nil, err
 		}
 	}
+	fmt.Println("RECORDS", len(records))
 	record := builder.NewRecord()
 	defer record.Release()
 	var buf bytes.Buffer
@@ -210,8 +230,48 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 				builder.(*array.FixedSizeBinaryBuilder).Append(records[i].([]byte))
 			}
 		}
+	case avro.Type(avro.LogicalTypeDecimal):
+		for i := range records {
+			if isNil(records[i]) {
+				builder.AppendNull()
+			} else {
+				builder.(*array.Decimal128Builder).Append(records[i].(decimal128.Num))
+			}
+		}
+	case avro.Type(avro.LogicalTypeDate):
+		for i := range records {
+			if isNil(records[i]) {
+				builder.AppendNull()
+			} else {
+				builder.(*array.Date32Builder).Append(records[i].(arrow.Date32))
+			}
+		}
+	case avro.Type(avro.LogicalTypeTime):
+		for i := range records {
+			if isNil(records[i]) {
+				builder.AppendNull()
+			} else {
+				builder.(*array.Time32Builder).Append(records[i].(arrow.Time32))
+			}
+		}
+	case avro.Type(avro.LogicalTypeTimestamp):
+		for i := range records {
+			if isNil(records[i]) {
+				builder.AppendNull()
+			} else {
+				builder.(*array.TimestampBuilder).Append(records[i].(arrow.Timestamp))
+			}
+		}
+	case avro.Type(avro.LogialTypeDuration):
+		for i := range records {
+			if isNil(records[i]) {
+				builder.AppendNull()
+			} else {
+				builder.(*array.DurationBuilder).Append(records[i].(arrow.Duration))
+			}
+		}
 	case avro.TypeUnion:
-		union := *avroField.(*avro.UnionSchema)
+		union := avroField.(avro.UnionSchema)
 		valid := false
 		for i := range union {
 			valid = union[i].TypeName() != avro.TypeNull
