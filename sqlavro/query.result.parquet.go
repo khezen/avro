@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math/big"
 	"reflect"
+	"time"
 
 	"github.com/apache/arrow/go/v14/arrow"
 	"github.com/apache/arrow/go/v14/arrow/array"
@@ -89,8 +91,10 @@ func avroField2arrowField(name string, field avro.Schema) (node arrow.Field, err
 	switch field.TypeName() {
 	case avro.TypeBoolean:
 		node = arrow.Field{Name: name, Type: arrow.FixedWidthTypes.Boolean}
-	case avro.TypeInt32, avro.TypeInt64:
+	case avro.TypeInt32:
 		node = arrow.Field{Name: name, Type: arrow.PrimitiveTypes.Int32}
+	case avro.TypeInt64:
+		node = arrow.Field{Name: name, Type: arrow.PrimitiveTypes.Int64}
 	case avro.TypeFloat32:
 		node = arrow.Field{Name: name, Type: arrow.PrimitiveTypes.Float32}
 	case avro.TypeFloat64:
@@ -182,12 +186,20 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 				builder.(*array.BooleanBuilder).Append(records[i].(bool))
 			}
 		}
-	case avro.TypeInt32, avro.TypeInt64:
+	case avro.TypeInt32:
 		for i := range records {
 			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
 				builder.(*array.Int32Builder).Append(records[i].(int32))
+			}
+		}
+	case avro.TypeInt64:
+		for i := range records {
+			if isNil(records[i]) {
+				builder.AppendNull()
+			} else {
+				builder.(*array.Int64Builder).Append(records[i].(int64))
 			}
 		}
 	case avro.TypeFloat32:
@@ -235,7 +247,10 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
-				builder.(*array.Decimal128Builder).Append(records[i].(decimal128.Num))
+				rec := records[i].(*big.Rat)
+				decimalBigInt := rec.Num().Div(rec.Num(), rec.Denom())
+				dcml := decimal128.FromBigInt(decimalBigInt)
+				builder.(*array.Decimal128Builder).Append(dcml)
 			}
 		}
 	case avro.Type(avro.LogicalTypeDate):
@@ -243,7 +258,11 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
-				builder.(*array.Date32Builder).Append(records[i].(arrow.Date32))
+				var (
+					dayInSeconds int64 = 24 * 60 * 60
+					unixDays     int64 = records[i].(time.Time).Unix() / dayInSeconds
+				)
+				builder.(*array.Date32Builder).Append(arrow.Date32(int32(unixDays)))
 			}
 		}
 	case avro.Type(avro.LogicalTypeTime):
@@ -251,7 +270,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
-				builder.(*array.Time32Builder).Append(records[i].(arrow.Time32))
+				builder.(*array.Time32Builder).Append(arrow.Time32(records[i].(int32)))
 			}
 		}
 	case avro.Type(avro.LogicalTypeTimestamp):
@@ -259,7 +278,7 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 			if isNil(records[i]) {
 				builder.AppendNull()
 			} else {
-				builder.(*array.TimestampBuilder).Append(records[i].(arrow.Timestamp))
+				builder.(*array.TimestampBuilder).Append(arrow.Timestamp(records[i].(int32)))
 			}
 		}
 	case avro.Type(avro.LogialTypeDuration):
