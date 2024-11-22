@@ -43,6 +43,7 @@ func query2Parquet(cfg QueryConfig) (parquetBytes []byte, newCriteria []Criterio
 			return nil, nil, err
 		}
 		for i, field := range cfg.Schema.Fields {
+			fmt.Println(field.Name, latestRecord[field.Name])
 			records[i] = append(records[i], latestRecord[field.Name])
 		}
 	}
@@ -147,7 +148,6 @@ func nativeRecordToArrowRecord(avroSchema *avro.RecordSchema, arrowSchema *arrow
 			return nil, err
 		}
 	}
-	fmt.Println("RECORDS", len(records))
 	record := builder.NewRecord()
 	defer record.Release()
 	var buf bytes.Buffer
@@ -276,6 +276,15 @@ func nativeField2arrowField(avroField avro.Schema, builder array.Builder, record
 		for i := range union {
 			valid = union[i].TypeName() != avro.TypeNull
 			if valid {
+				for i := range records {
+					valueMap, ok := records[i].(map[string]interface{})
+					if ok {
+						for _, v := range valueMap {
+							records[i] = v
+							break
+						}
+					}
+				}
 				err = nativeField2arrowField(union[i], builder, records)
 				break
 			}
