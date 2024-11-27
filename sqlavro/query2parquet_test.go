@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"log"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -190,24 +191,22 @@ func TestQuery2Parquet(t *testing.T) {
 	defer parquetReader.Close()
 	metadata := parquetReader.MetaData()
 	fmt.Printf("Number of Rows: %d\n", metadata.NumRows)
-	// for i := 0; i < metadata.NumRows; i++ {
-	// 	rowGroupReader := parquetReader.RowGroup(i)
-	// 	for j := 0; j < rowGroupReader.NumColumns(); j++ {
-	// 		columnReader, err := rowGroupReader.Column(j)
-	// 		if err != nil {
-	// 			log.Fatalf("Failed to get column reader: %v", err)
-	// 		}
-
-	// 		// Read and print data (adjust according to your schema)
-	// 		values := make([]interface{}, 10) // Adjust size as needed
-	// 		numRead, err := columnReader.ReadValues(values)
-	// 		if err != nil {
-	// 			log.Fatalf("Failed to read column values: %v", err)
-	// 		}
-
-	// 		fmt.Printf("Column %d values: %v\n", j, values[:numRead])
-	// 	}
-	// }
+	for i := 0; i < int(metadata.NumRows); i++ {
+		rowGroupReader := parquetReader.RowGroup(i)
+		rowGroupReader.
+		for j := 0; j < rowGroupReader.NumColumns(); j++ {
+			columnReader, err := rowGroupReader.Column(j)
+			if err != nil {
+				log.Fatalf("Failed to get column reader: %v", err)
+			}
+			values := make([]interface{}, 10)
+			numRead, err := columnReader
+			if err != nil {
+				log.Fatalf("Failed to read column values: %v", err)
+			}
+			fmt.Printf("Column %d values: %v\n", j, values[:numRead])
+		}
+	}
 	// TODO read bytes into map[string]interface{}
 	// TODO verify data
 	// Convert binary Parquet data back to native Go form

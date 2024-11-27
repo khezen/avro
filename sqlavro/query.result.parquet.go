@@ -45,7 +45,6 @@ func query2Parquet(cfg QueryConfig) (parquetBytes []byte, newCriteria []Criterio
 			return nil, nil, err
 		}
 		for i, field := range cfg.Schema.Fields {
-			fmt.Println(field.Name, latestRecord[field.Name])
 			records[i] = append(records[i], latestRecord[field.Name])
 		}
 	}
